@@ -23,6 +23,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { AnimatedLogo } from "../ui/animated-logo";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -32,6 +43,8 @@ interface SidebarProps {
 const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
   const location = useLocation();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -88,9 +101,14 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
   ];
 
   const bottomNavItems = [
-    { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
-    { name: "Help", path: "/help", icon: <HelpCircle size={20} /> },
-    { name: "Logout", path: "/logout", icon: <LogOut size={20} /> },
+    { name: "Configurações", path: "/settings", icon: <Settings size={20} /> },
+    {
+      name: "Ajuda",
+      path: "/help",
+      icon: <HelpCircle size={20} />,
+      onClick: () => setShowHelpDialog(true),
+    },
+    { name: "Perfil", path: "/profile", icon: <User size={20} /> },
   ];
 
   const isActive = (path: string) => {
@@ -108,11 +126,14 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
         {/* Logo */}
         <div className="flex items-center justify-center h-16 border-b border-slate-700">
           {!isCollapsed ? (
-            <div className="text-xl font-bold text-blue-500">
-              LATAM Airlines
+            <div className="flex items-center">
+              <AnimatedLogo size="sm" color="white" className="mr-2" />
+              <div className="text-xl font-bold text-blue-500">
+                LATAM Airlines
+              </div>
             </div>
           ) : (
-            <div className="text-xl font-bold text-blue-500">LA</div>
+            <AnimatedLogo size="sm" color="white" />
           )}
         </div>
 
@@ -168,18 +189,33 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Link
-                      to={item.path}
-                      className={cn(
-                        "flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
-                        isActive(item.path)
-                          ? "bg-slate-800 text-blue-400"
-                          : "text-slate-300",
-                      )}
-                    >
-                      <span className="mr-3">{item.icon}</span>
-                      {!isCollapsed && <span>{item.name}</span>}
-                    </Link>
+                    {item.onClick ? (
+                      <button
+                        onClick={item.onClick}
+                        className={cn(
+                          "w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
+                          isActive(item.path)
+                            ? "bg-slate-800 text-blue-400"
+                            : "text-slate-300",
+                        )}
+                      >
+                        <span className="mr-3">{item.icon}</span>
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </button>
+                    ) : (
+                      <Link
+                        to={item.path}
+                        className={cn(
+                          "flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
+                          isActive(item.path)
+                            ? "bg-slate-800 text-blue-400"
+                            : "text-slate-300",
+                        )}
+                      >
+                        <span className="mr-3">{item.icon}</span>
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </Link>
+                    )}
                   </TooltipTrigger>
                   {isCollapsed && (
                     <TooltipContent side="right">
@@ -190,8 +226,63 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
               </TooltipProvider>
             </li>
           ))}
+          <li>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowLogoutDialog(true)}
+                    className="w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors text-slate-300"
+                  >
+                    <span className="mr-3">
+                      <LogOut size={20} />
+                    </span>
+                    {!isCollapsed && <span>Sair</span>}
+                  </button>
+                </TooltipTrigger>
+                {isCollapsed && (
+                  <TooltipContent side="right">
+                    <p>Sair</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          </li>
         </ul>
       </div>
+
+      {/* Logout Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Saída</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja sair do sistema?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button variant="destructive">Sair</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Help Dialog */}
+      <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Ajuda e Suporte</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <iframe src="/help" className="w-full h-[70vh] border-0" />
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 };

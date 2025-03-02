@@ -1,7 +1,4 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Bell,
   AlertTriangle,
@@ -11,6 +8,9 @@ import {
   X,
   MoreVertical,
 } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface Alert {
   id: string;
@@ -137,7 +137,7 @@ const AlertsPanel = ({
                         {alert.severity}
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 mt-1">
                       {alert.message}
                     </p>
                     <p className="text-xs text-gray-400 mt-1">

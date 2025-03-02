@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,11 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
+import AlertsPanel from "./AlertsPanel";
+import FlightStatusOverview from "./FlightStatusOverview";
+import AircraftAvailability from "./AircraftAvailability";
+import OperationalKPIs from "./OperationalKPIs";
+import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 interface KPICardProps {
   title: string;
@@ -86,8 +91,8 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate data loading
+  // Simulate data loading
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
