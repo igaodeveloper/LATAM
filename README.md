@@ -147,3 +147,40 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Deploy
+
+### Deploy no Vercel
+
+1. Crie uma conta no [Vercel](https://vercel.com/) se ainda não tiver uma.
+2. Conecte sua conta do Vercel ao GitHub, GitLab ou Bitbucket onde seu repositório está hospedado.
+3. Importe o projeto no Vercel:
+   - Clique em "Add New" → "Project"
+   - Selecione o repositório
+   - Configure as variáveis de ambiente necessárias:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `VITE_BASE_PATH` (geralmente `/`)
+   - Clique em "Deploy"
+
+### Deploy no Netlify
+
+1. Crie uma conta no [Netlify](https://netlify.com/) se ainda não tiver uma.
+2. Conecte sua conta do Netlify ao GitHub, GitLab ou Bitbucket onde seu repositório está hospedado.
+3. Importe o projeto no Netlify:
+   - Clique em "Add new site" → "Import an existing project"
+   - Selecione o repositório
+   - Configure as seguintes opções:
+     - Build command: `npm run build`
+     - Publish directory: `dist`
+   - Configure as variáveis de ambiente necessárias:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `VITE_BASE_PATH` (geralmente `/`)
+   - Clique em "Deploy site"
+
+## Solução de problemas comuns
+
+- **Problema de roteamento**: Se as rotas não estiverem funcionando após o deploy, verifique se os arquivos `vercel.json` (para Vercel) ou `netlify.toml` e `public/_redirects` (para Netlify) estão presentes e configurados corretamente.
+- **Variáveis de ambiente**: Certifique-se de que todas as variáveis de ambiente necessárias estão configuradas corretamente na plataforma de deploy.
+- **Erro de build**: Se houver erros durante o build, verifique os logs de build na plataforma de deploy para identificar e corrigir o problema.
