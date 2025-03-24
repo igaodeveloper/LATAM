@@ -54,7 +54,13 @@ import {
   MapPin,
   Tag,
   Star,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Plane,
 } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Passenger {
   id: string;
@@ -70,6 +76,14 @@ interface Passenger {
     mealPreference?: string;
     specialAssistance?: boolean;
   };
+  booking: string;
+  flight: string;
+  class: string;
+  departure: Date;
+  arrival: Date;
+  origin: string;
+  destination: string;
+  specialNeeds: string[];
 }
 
 interface Complaint {
@@ -90,64 +104,64 @@ interface PassengerManagementProps {
 const PassengerManagement = ({
   passengers = [
     {
-      id: "1",
-      name: "Maria Silva",
-      email: "maria.silva@email.com",
-      phone: "+55 11 98765-4321",
-      status: "active",
-      membershipLevel: "gold",
-      totalFlights: 48,
-      lastFlight: "2023-11-15",
-      preferences: {
-        seatPreference: "window",
-        mealPreference: "vegetarian",
-        specialAssistance: false,
-      },
+      id: "PAS001",
+      name: "João Silva",
+      booking: "BK123456",
+      flight: "LA1234",
+      class: "Business",
+      status: "confirmed",
+      email: "joao.silva@email.com",
+      phone: "(11) 99999-9999",
+      departure: new Date(2024, 2, 15, 14, 0),
+      arrival: new Date(2024, 2, 15, 16, 30),
+      origin: "São Paulo",
+      destination: "Rio de Janeiro",
+      specialNeeds: ["Wheelchair", "Special Meal"],
     },
     {
-      id: "2",
-      name: "João Santos",
-      email: "joao.santos@email.com",
-      phone: "+55 21 99876-5432",
-      status: "active",
-      membershipLevel: "platinum",
-      totalFlights: 87,
-      lastFlight: "2023-11-28",
-      preferences: {
-        seatPreference: "aisle",
-        mealPreference: "regular",
-        specialAssistance: false,
-      },
+      id: "PAS002",
+      name: "Maria Santos",
+      booking: "BK123457",
+      flight: "LA1234",
+      class: "Economy",
+      status: "checked_in",
+      email: "maria.santos@email.com",
+      phone: "(11) 98888-8888",
+      departure: new Date(2024, 2, 15, 14, 0),
+      arrival: new Date(2024, 2, 15, 16, 30),
+      origin: "São Paulo",
+      destination: "Rio de Janeiro",
+      specialNeeds: ["Special Meal"],
     },
     {
-      id: "3",
-      name: "Ana Oliveira",
-      email: "ana.oliveira@email.com",
-      phone: "+55 31 97654-3210",
-      status: "inactive",
-      membershipLevel: "standard",
-      totalFlights: 12,
-      lastFlight: "2023-08-05",
-      preferences: {
-        seatPreference: "no-preference",
-        mealPreference: "kosher",
-        specialAssistance: true,
-      },
+      id: "PAS003",
+      name: "Pedro Oliveira",
+      booking: "BK123458",
+      flight: "LA5678",
+      class: "Premium",
+      status: "pending",
+      email: "pedro.oliveira@email.com",
+      phone: "(11) 97777-7777",
+      departure: new Date(2024, 2, 15, 16, 30),
+      arrival: new Date(2024, 2, 15, 19, 0),
+      origin: "Rio de Janeiro",
+      destination: "Brasília",
+      specialNeeds: [],
     },
     {
-      id: "4",
-      name: "Carlos Pereira",
-      email: "carlos.pereira@email.com",
-      phone: "+55 41 96543-2109",
-      status: "active",
-      membershipLevel: "silver",
-      totalFlights: 23,
-      lastFlight: "2023-10-20",
-      preferences: {
-        seatPreference: "window",
-        mealPreference: "regular",
-        specialAssistance: false,
-      },
+      id: "PAS004",
+      name: "Ana Costa",
+      booking: "BK123459",
+      flight: "LA5678",
+      class: "Economy",
+      status: "cancelled",
+      email: "ana.costa@email.com",
+      phone: "(11) 96666-6666",
+      departure: new Date(2024, 2, 15, 16, 30),
+      arrival: new Date(2024, 2, 15, 19, 0),
+      origin: "Rio de Janeiro",
+      destination: "Brasília",
+      specialNeeds: ["Wheelchair"],
     },
   ],
   complaints = [
@@ -191,9 +205,9 @@ const PassengerManagement = ({
   ],
 }: PassengerManagementProps) => {
   const [activeTab, setActiveTab] = useState("passengers");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [membershipFilter, setMembershipFilter] = useState("all");
+  const [classFilter, setClassFilter] = useState("all");
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(
     null,
   );
@@ -206,21 +220,20 @@ const PassengerManagement = ({
   // Filter passengers based on search and filters
   const filteredPassengers = passengers.filter((passenger) => {
     const matchesSearch =
-      passenger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      passenger.email.toLowerCase().includes(searchTerm.toLowerCase());
+      passenger.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      passenger.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || passenger.status === statusFilter;
-    const matchesMembership =
-      membershipFilter === "all" ||
-      passenger.membershipLevel === membershipFilter;
-    return matchesSearch && matchesStatus && matchesMembership;
+    const matchesClass =
+      classFilter === "all" || passenger.class === classFilter;
+    return matchesSearch && matchesStatus && matchesClass;
   });
 
   // Filter complaints based on search
   const filteredComplaints = complaints.filter((complaint) => {
     const matchesSearch =
-      complaint.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      complaint.description.toLowerCase().includes(searchTerm.toLowerCase());
+      complaint.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -283,393 +296,260 @@ const PassengerManagement = ({
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return "text-green-600 bg-green-50";
+      case "checked_in":
+        return "text-blue-600 bg-blue-50";
+      case "pending":
+        return "text-yellow-600 bg-yellow-50";
+      case "cancelled":
+        return "text-red-600 bg-red-50";
+      default:
+        return "text-gray-600 bg-gray-50";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return <CheckCircle className="h-4 w-4" />;
+      case "checked_in":
+        return <User className="h-4 w-4" />;
+      case "pending":
+        return <Clock className="h-4 w-4" />;
+      case "cancelled":
+        return <AlertCircle className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="w-full h-full bg-background p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-primary">
-            Passenger Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage passenger profiles, analyze behavior, and handle support
-            requests
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <UserPlus size={16} />
-                New Passenger
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>Add New Passenger</DialogTitle>
-                <DialogDescription>
-                  Enter the passenger details to create a new profile.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="John Doe" />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john.doe@example.com"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" placeholder="+55 11 98765-4321" />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="membership">Membership Level</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="standard">Standard</SelectItem>
-                        <SelectItem value="silver">Silver</SelectItem>
-                        <SelectItem value="gold">Gold</SelectItem>
-                        <SelectItem value="platinum">Platinum</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="preferences">Preferences</Label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="seatPreference" className="text-sm">
-                        Seat Preference
-                      </Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select preference" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="window">Window</SelectItem>
-                          <SelectItem value="aisle">Aisle</SelectItem>
-                          <SelectItem value="middle">Middle</SelectItem>
-                          <SelectItem value="no-preference">
-                            No Preference
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="mealPreference" className="text-sm">
-                        Meal Preference
-                      </Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select preference" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="regular">Regular</SelectItem>
-                          <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                          <SelectItem value="vegan">Vegan</SelectItem>
-                          <SelectItem value="kosher">Kosher</SelectItem>
-                          <SelectItem value="halal">Halal</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline">Cancel</Button>
-                <Button type="submit">Create Passenger</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+    <div className="container mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Gestão de Passageiros</h1>
+        <p className="text-gray-500">Gerencie reservas e informações de passageiros</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex justify-between items-center mb-4">
-          <TabsList>
-            <TabsTrigger value="passengers" className="gap-2">
-              <User size={16} />
-              Passengers
-            </TabsTrigger>
-            <TabsTrigger value="behavior" className="gap-2">
-              <BarChart3 size={16} />
-              Behavior Analysis
-            </TabsTrigger>
-            <TabsTrigger value="complaints" className="gap-2">
-              <MessageSquare size={16} />
-              Complaints & Support
-            </TabsTrigger>
-          </TabsList>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-[250px] pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" size="icon">
-              <Filter size={16} />
-            </Button>
-          </div>
-        </div>
-
-        <TabsContent value="passengers" className="mt-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Passenger Directory</CardTitle>
-              <div className="flex gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={membershipFilter}
-                  onValueChange={setMembershipFilter}
-                >
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Membership" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Levels</SelectItem>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="silver">Silver</SelectItem>
-                    <SelectItem value="gold">Gold</SelectItem>
-                    <SelectItem value="platinum">Platinum</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Membership</TableHead>
-                    <TableHead>Total Flights</TableHead>
-                    <TableHead>Last Flight</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPassengers.length > 0 ? (
-                    filteredPassengers.map((passenger) => (
-                      <TableRow key={passenger.id}>
-                        <TableCell className="font-medium">
-                          {passenger.name}
-                        </TableCell>
-                        <TableCell>{passenger.email}</TableCell>
-                        <TableCell>{passenger.phone}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={`${passenger.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                          >
-                            {passenger.status === "active"
-                              ? "Active"
-                              : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {getMembershipBadge(passenger.membershipLevel)}
-                        </TableCell>
-                        <TableCell>{passenger.totalFlights}</TableCell>
-                        <TableCell>{passenger.lastFlight || "N/A"}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleViewPassenger(passenger)}
-                            >
-                              View
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical size={16} />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem className="gap-2">
-                                  <Edit size={14} />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="gap-2 text-destructive">
-                                  <Trash2 size={14} />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-4">
-                        No passengers found matching your criteria.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="behavior" className="mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-3">
           <Card>
             <CardHeader>
-              <CardTitle>Passenger Behavior Analysis</CardTitle>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Pesquisar passageiros..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 w-[300px]"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      <SelectItem value="confirmed">Confirmado</SelectItem>
+                      <SelectItem value="checked_in">Check-in</SelectItem>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="cancelled">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={classFilter} onValueChange={setClassFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Classe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="economy">Economy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova Reserva
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Travel Patterns</h3>
-                  <div className="border rounded-lg p-8 text-center bg-muted/20">
-                    <BarChart3 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      Travel pattern visualization would be displayed here,
-                      showing frequency, preferred routes, and seasonal trends.
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Reserva</TableHead>
+                    <TableHead>Voo</TableHead>
+                    <TableHead>Classe</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Contato</TableHead>
+                    <TableHead>Horário</TableHead>
+                    <TableHead>Rota</TableHead>
+                    <TableHead>Necessidades Especiais</TableHead>
+                    <TableHead>Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredPassengers.map((passenger) => (
+                    <TableRow key={passenger.id}>
+                      <TableCell className="font-medium">{passenger.id}</TableCell>
+                      <TableCell>{passenger.name}</TableCell>
+                      <TableCell>{passenger.booking}</TableCell>
+                      <TableCell>{passenger.flight}</TableCell>
+                      <TableCell>{passenger.class}</TableCell>
+                      <TableCell>
+                        <div
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                            passenger.status
+                          )}`}
+                        >
+                          {getStatusIcon(passenger.status)}
+                          <span className="ml-1">
+                            {passenger.status === "confirmed"
+                              ? "Confirmado"
+                              : passenger.status === "checked_in"
+                              ? "Check-in"
+                              : passenger.status === "pending"
+                              ? "Pendente"
+                              : "Cancelado"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <div className="flex items-center text-sm">
+                            <Mail className="h-3 w-3 mr-1" />
+                            {passenger.email}
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <Phone className="h-3 w-3 mr-1" />
+                            {passenger.phone}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <div className="flex items-center text-sm">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            {format(passenger.departure, "HH:mm", { locale: ptBR })}
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <Plane className="h-3 w-3 mr-1" />
+                            {format(passenger.arrival, "HH:mm", { locale: ptBR })}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {passenger.origin} → {passenger.destination}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {passenger.specialNeeds.map((need, index) => (
+                            <div
+                              key={index}
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600"
+                            >
+                              <Tag className="h-3 w-3 mr-1" />
+                              {need}
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm">
+                          Detalhes
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="md:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Resumo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Total de Passageiros</span>
+                  <span className="font-semibold">{passengers.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Confirmados</span>
+                  <span className="font-semibold text-green-600">
+                    {passengers.filter((p) => p.status === "confirmed").length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Check-in</span>
+                  <span className="font-semibold text-blue-600">
+                    {passengers.filter((p) => p.status === "checked_in").length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Pendentes</span>
+                  <span className="font-semibold text-yellow-600">
+                    {passengers.filter((p) => p.status === "pending").length}
+                  </span>
+                </div>
+              </div>
+              <div className="pt-4 border-t">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Necessidades Especiais</span>
+                  <span className="font-semibold text-blue-600">
+                    {passengers.filter((p) => p.specialNeeds.length > 0).length}
+                  </span>
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span className="text-gray-500">Cancelados</span>
+                  <span className="font-semibold text-red-600">
+                    {passengers.filter((p) => p.status === "cancelled").length}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Alertas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-500 mt-1" />
+                  <div>
+                    <p className="text-sm font-medium">Check-in Pendente</p>
+                    <p className="text-xs text-gray-500">
+                      5 passageiros próximos do horário
                     </p>
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Purchase History</h3>
-                  <div className="border rounded-lg p-8 text-center bg-muted/20">
-                    <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      Purchase history analysis would be displayed here, showing
-                      spending patterns, preferred classes, and add-on services.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <h3 className="text-lg font-medium mb-4">
-                    Passenger Segmentation
-                  </h3>
-                  <div className="border rounded-lg p-8 text-center bg-muted/20">
-                    <p className="text-muted-foreground">
-                      Passenger segmentation visualization would be displayed
-                      here, grouping customers by behavior, preferences, and
-                      value.
+                <div className="flex items-start space-x-2">
+                  <AlertCircle className="h-4 w-4 text-red-500 mt-1" />
+                  <div>
+                    <p className="text-sm font-medium">Cancelamentos</p>
+                    <p className="text-xs text-gray-500">
+                      2 reservas canceladas hoje
                     </p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="complaints" className="mt-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Complaints & Support Requests</CardTitle>
-              <Button className="gap-2">
-                <Plus size={16} />
-                New Complaint
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Passenger</TableHead>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredComplaints.length > 0 ? (
-                    filteredComplaints.map((complaint) => {
-                      const passenger = passengers.find(
-                        (p) => p.id === complaint.passengerId,
-                      );
-                      return (
-                        <TableRow key={complaint.id}>
-                          <TableCell>{complaint.date}</TableCell>
-                          <TableCell className="font-medium">
-                            {passenger?.name || "Unknown"}
-                          </TableCell>
-                          <TableCell>{complaint.subject}</TableCell>
-                          <TableCell>
-                            {getComplaintStatusBadge(complaint.status)}
-                          </TableCell>
-                          <TableCell>
-                            {getComplaintPriorityBadge(complaint.priority)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleViewComplaint(complaint)}
-                              >
-                                View
-                              </Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreVertical size={16} />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem className="gap-2">
-                                    <Edit size={14} />
-                                    Update Status
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="gap-2">
-                                    <MessageSquare size={14} />
-                                    Add Comment
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-4">
-                        No complaints found matching your criteria.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       {/* Passenger Details Dialog */}
       <Dialog

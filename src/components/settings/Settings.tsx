@@ -1,583 +1,781 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import {
-  Settings as SettingsIcon,
-  Bell,
-  Globe,
-  Lock,
-  Moon,
-  Sun,
-  User,
-  Shield,
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Switch } from "../ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { 
+  Search, Save, Bell, Globe, Lock, User, Mail, Database, Shield, 
+  BellRing, BellOff, DollarSign, Palette, Sliders, Zap, Cloud, Key, 
+  History, Trash2, AlertCircle, CheckCircle2, XCircle, Info, 
+  ChevronRight, ChevronDown, Bug, Activity, Beaker,
+  Wrench,
+  Fingerprint
 } from "lucide-react";
+import { toast } from "sonner";
+import { Progress } from "../ui/progress";
+import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
+import { ScrollArea } from "../ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("general");
-  const [language, setLanguage] = useState("pt-BR");
-  const [theme, setTheme] = useState("light");
   const [notifications, setNotifications] = useState({
     email: true,
     push: true,
     sms: false,
-    flightUpdates: true,
-    maintenanceAlerts: true,
-    crewChanges: false,
-    systemUpdates: true,
+    maintenance: true,
+    safety: true,
+    financial: false,
+    marketing: false,
+    updates: true,
+    alerts: true,
   });
 
+  const [preferences, setPreferences] = useState({
+    language: "pt-BR",
+    timezone: "America/Sao_Paulo",
+    dateFormat: "dd/MM/yyyy",
+    timeFormat: "24h",
+    theme: "light",
+    fontSize: "medium",
+    contrast: "normal",
+    animations: true,
+    compactMode: false,
+  });
+
+  const [security, setSecurity] = useState({
+    twoFactor: true,
+    sessionTimeout: 30,
+    passwordExpiry: 90,
+    loginAttempts: 5,
+    biometric: false,
+    encryption: true,
+    auditLog: true,
+    backupFrequency: "daily",
+  });
+
+  const [integrations, setIntegrations] = useState({
+    maintenance: true,
+    inventory: true,
+    financial: false,
+    safety: true,
+    analytics: true,
+    reporting: true,
+    api: false,
+    webhooks: false,
+  });
+
+  const [advanced, setAdvanced] = useState({
+    debugMode: false,
+    performanceMode: false,
+    cacheSize: 100,
+    logLevel: "info",
+    autoUpdate: true,
+    telemetry: false,
+    experimental: false,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("notifications");
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("Configurações salvas com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao salvar configurações");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    toast.warning("Tem certeza que deseja redefinir todas as configurações?");
+    // Implement reset logic
+  };
+
   return (
-    <div className="w-full h-full bg-background p-6">
+    <div className="container mx-auto p-6 max-w-5xl">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Configurações</h1>
-          <p className="text-muted-foreground">
-            Gerencie as configurações do sistema
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
+          <p className="text-gray-500">Gerencie suas preferências e configurações do sistema</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleReset}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Redefinir
+          </Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Salvar Alterações
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="md:col-span-1">
-          <CardContent className="p-4">
-            <Tabs
-              orientation="vertical"
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="flex flex-col items-start h-auto bg-transparent space-y-1">
-                <TabsTrigger
-                  value="general"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <SettingsIcon className="h-4 w-4 mr-2" />
-                  Geral
-                </TabsTrigger>
-                <TabsTrigger
-                  value="notifications"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notificações
-                </TabsTrigger>
-                <TabsTrigger
-                  value="appearance"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <Sun className="h-4 w-4 mr-2" />
-                  Aparência
-                </TabsTrigger>
-                <TabsTrigger
-                  value="language"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <Globe className="h-4 w-4 mr-2" />
-                  Idioma
-                </TabsTrigger>
-                <TabsTrigger
-                  value="security"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <Lock className="h-4 w-4 mr-2" />
-                  Segurança
-                </TabsTrigger>
-                <TabsTrigger
-                  value="privacy"
-                  className="w-full justify-start px-2 py-1.5"
-                >
-                  <Shield className="h-4 w-4 mr-2" />
-                  Privacidade
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="notifications" className="space-y-6" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="notifications" className="flex items-center space-x-2">
+            <Bell className="h-4 w-4" />
+            <span>Notificações</span>
+          </TabsTrigger>
+          <TabsTrigger value="preferences" className="flex items-center space-x-2">
+            <Globe className="h-4 w-4" />
+            <span>Preferências</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex items-center space-x-2">
+            <Lock className="h-4 w-4" />
+            <span>Segurança</span>
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="flex items-center space-x-2">
+            <Database className="h-4 w-4" />
+            <span>Integrações</span>
+          </TabsTrigger>
+          <TabsTrigger value="advanced" className="flex items-center space-x-2">
+            <Sliders className="h-4 w-4" />
+            <span>Avançado</span>
+          </TabsTrigger>
+        </TabsList>
 
-        <Card className="md:col-span-3">
-          <CardContent className="p-6">
-            <TabsContent value="general" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  Configurações Gerais
-                </h2>
+        <ScrollArea className="h-[calc(100vh-200px)]">
+          <TabsContent value="notifications" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações de Notificação</CardTitle>
+                <CardDescription>
+                  Gerencie como e quando você recebe notificações
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="auto-update">
-                        Atualizações Automáticas
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Atualizar automaticamente os dados do sistema
-                      </p>
+                    <div className="flex items-center space-x-2">
+                      <Mail className="h-4 w-4" />
+                      <Label>Notificações por Email</Label>
                     </div>
-                    <Switch id="auto-update" checked={true} />
+                    <Switch
+                      checked={notifications.email}
+                      onCheckedChange={(checked) =>
+                        setNotifications({ ...notifications, email: checked })
+                      }
+                    />
                   </div>
-                  <Separator />
                   <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="data-sync">Sincronização de Dados</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Sincronizar dados entre dispositivos
-                      </p>
+                    <div className="flex items-center space-x-2">
+                      <BellRing className="h-4 w-4" />
+                      <Label>Notificações Push</Label>
                     </div>
-                    <Switch id="data-sync" checked={true} />
+                    <Switch
+                      checked={notifications.push}
+                      onCheckedChange={(checked) =>
+                        setNotifications({ ...notifications, push: checked })
+                      }
+                    />
                   </div>
-                  <Separator />
                   <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="analytics">Análise de Uso</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir coleta de dados anônimos para melhorar o
-                        sistema
-                      </p>
+                    <div className="flex items-center space-x-2">
+                      <BellOff className="h-4 w-4" />
+                      <Label>Notificações por SMS</Label>
                     </div>
-                    <Switch id="analytics" checked={false} />
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label htmlFor="refresh-rate">
-                      Taxa de Atualização (segundos)
-                    </Label>
-                    <Input
-                      id="refresh-rate"
-                      type="number"
-                      defaultValue="30"
-                      min="5"
-                      max="300"
+                    <Switch
+                      checked={notifications.sms}
+                      onCheckedChange={(checked) =>
+                        setNotifications({ ...notifications, sms: checked })
+                      }
                     />
                   </div>
                 </div>
-              </div>
-            </TabsContent>
 
-            <TabsContent value="notifications" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  Configurações de Notificações
-                </h2>
+                <Separator />
+
                 <div className="space-y-4">
+                  <h3 className="text-sm font-medium">Tipos de Notificação</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Wrench className="h-4 w-4" />
+                        <Label>Manutenção</Label>
+                      </div>
+                      <Switch
+                        checked={notifications.maintenance}
+                        onCheckedChange={(checked) =>
+                          setNotifications({ ...notifications, maintenance: checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Shield className="h-4 w-4" />
+                        <Label>Segurança</Label>
+                      </div>
+                      <Switch
+                        checked={notifications.safety}
+                        onCheckedChange={(checked) =>
+                          setNotifications({ ...notifications, safety: checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <DollarSign className="h-4 w-4" />
+                        <Label>Financeiro</Label>
+                      </div>
+                      <Switch
+                        checked={notifications.financial}
+                        onCheckedChange={(checked) =>
+                          setNotifications({ ...notifications, financial: checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-4 w-4" />
+                        <Label>Atualizações</Label>
+                      </div>
+                      <Switch
+                        checked={notifications.updates}
+                        onCheckedChange={(checked) =>
+                          setNotifications({ ...notifications, updates: checked })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preferences" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Preferências do Sistema</CardTitle>
+                <CardDescription>
+                  Configure suas preferências de idioma, fuso horário e aparência
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium">
-                      Canais de Notificação
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="email-notifications">Email</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receber notificações por email
-                        </p>
-                      </div>
-                      <Switch
-                        id="email-notifications"
-                        checked={notifications.email}
-                        onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, email: checked })
+                    <div className="space-y-2">
+                      <Label>Idioma</Label>
+                      <Select
+                        value={preferences.language}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, language: value })
                         }
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="push-notifications">
-                          Notificações Push
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receber notificações no navegador
-                        </p>
-                      </div>
-                      <Switch
-                        id="push-notifications"
-                        checked={notifications.push}
-                        onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, push: checked })
-                        }
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="sms-notifications">SMS</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receber notificações por SMS
-                        </p>
-                      </div>
-                      <Switch
-                        id="sms-notifications"
-                        checked={notifications.sms}
-                        onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, sms: checked })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mt-6">
-                    <h3 className="text-lg font-medium">
-                      Tipos de Notificação
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="flight-updates">
-                          Atualizações de Voo
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          Alterações de status, atrasos, cancelamentos
-                        </p>
-                      </div>
-                      <Switch
-                        id="flight-updates"
-                        checked={notifications.flightUpdates}
-                        onCheckedChange={(checked) =>
-                          setNotifications({
-                            ...notifications,
-                            flightUpdates: checked,
-                          })
-                        }
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="maintenance-alerts">
-                          Alertas de Manutenção
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          Manutenções programadas e urgentes
-                        </p>
-                      </div>
-                      <Switch
-                        id="maintenance-alerts"
-                        checked={notifications.maintenanceAlerts}
-                        onCheckedChange={(checked) =>
-                          setNotifications({
-                            ...notifications,
-                            maintenanceAlerts: checked,
-                          })
-                        }
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="crew-changes">
-                          Alterações de Tripulação
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          Mudanças nas escalas e alocações
-                        </p>
-                      </div>
-                      <Switch
-                        id="crew-changes"
-                        checked={notifications.crewChanges}
-                        onCheckedChange={(checked) =>
-                          setNotifications({
-                            ...notifications,
-                            crewChanges: checked,
-                          })
-                        }
-                      />
-                    </div>
-                    <Separator />
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="system-updates">
-                          Atualizações do Sistema
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          Novas funcionalidades e melhorias
-                        </p>
-                      </div>
-                      <Switch
-                        id="system-updates"
-                        checked={notifications.systemUpdates}
-                        onCheckedChange={(checked) =>
-                          setNotifications({
-                            ...notifications,
-                            systemUpdates: checked,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="appearance" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Aparência</h2>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Tema</Label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button
-                        variant={theme === "light" ? "default" : "outline"}
-                        className="justify-start"
-                        onClick={() => setTheme("light")}
                       >
-                        <Sun className="h-4 w-4 mr-2" />
-                        Claro
-                      </Button>
-                      <Button
-                        variant={theme === "dark" ? "default" : "outline"}
-                        className="justify-start"
-                        onClick={() => setTheme("dark")}
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o idioma" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
+                          <SelectItem value="en-US">English (US)</SelectItem>
+                          <SelectItem value="es-ES">Español</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Fuso Horário</Label>
+                      <Select
+                        value={preferences.timezone}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, timezone: value })
+                        }
                       >
-                        <Moon className="h-4 w-4 mr-2" />
-                        Escuro
-                      </Button>
-                      <Button
-                        variant={theme === "system" ? "default" : "outline"}
-                        className="justify-start"
-                        onClick={() => setTheme("system")}
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o fuso horário" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="America/Sao_Paulo">São Paulo (GMT-3)</SelectItem>
+                          <SelectItem value="America/New_York">New York (GMT-4)</SelectItem>
+                          <SelectItem value="Europe/London">London (GMT+1)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Formato de Data</Label>
+                      <Select
+                        value={preferences.dateFormat}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, dateFormat: value })
+                        }
                       >
-                        <SettingsIcon className="h-4 w-4 mr-2" />
-                        Sistema
-                      </Button>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o formato" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dd/MM/yyyy">DD/MM/YYYY</SelectItem>
+                          <SelectItem value="MM/dd/yyyy">MM/DD/YYYY</SelectItem>
+                          <SelectItem value="yyyy-MM-dd">YYYY-MM-DD</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label htmlFor="font-size">Tamanho da Fonte</Label>
-                    <Select defaultValue="medium">
-                      <SelectTrigger id="font-size">
-                        <SelectValue placeholder="Selecione o tamanho da fonte" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small">Pequeno</SelectItem>
-                        <SelectItem value="medium">Médio</SelectItem>
-                        <SelectItem value="large">Grande</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="animations">Animações</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Ativar animações na interface
-                      </p>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Formato de Hora</Label>
+                      <Select
+                        value={preferences.timeFormat}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, timeFormat: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o formato" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="24h">24 horas</SelectItem>
+                          <SelectItem value="12h">12 horas</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Switch id="animations" checked={true} />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="compact-view">Modo Compacto</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Reduzir espaçamento entre elementos
-                      </p>
+
+                    <div className="space-y-2">
+                      <Label>Tema</Label>
+                      <Select
+                        value={preferences.theme}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, theme: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tema" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="light">Claro</SelectItem>
+                          <SelectItem value="dark">Escuro</SelectItem>
+                          <SelectItem value="system">Sistema</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Switch id="compact-view" checked={false} />
+
+                    <div className="space-y-2">
+                      <Label>Tamanho da Fonte</Label>
+                      <Select
+                        value={preferences.fontSize}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, fontSize: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tamanho" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="small">Pequeno</SelectItem>
+                          <SelectItem value="medium">Médio</SelectItem>
+                          <SelectItem value="large">Grande</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
 
-            <TabsContent value="language" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Idioma e Região</h2>
+                <Separator />
+
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="language-select">Idioma</Label>
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger id="language-select">
-                        <SelectValue placeholder="Selecione o idioma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pt-BR">
-                          Português (Brasil)
-                        </SelectItem>
-                        <SelectItem value="en-US">English (US)</SelectItem>
-                        <SelectItem value="es-ES">Español</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label htmlFor="date-format">Formato de Data</Label>
-                    <Select defaultValue="dd/mm/yyyy">
-                      <SelectTrigger id="date-format">
-                        <SelectValue placeholder="Selecione o formato de data" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="dd/mm/yyyy">DD/MM/AAAA</SelectItem>
-                        <SelectItem value="mm/dd/yyyy">MM/DD/AAAA</SelectItem>
-                        <SelectItem value="yyyy-mm-dd">AAAA-MM-DD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label htmlFor="time-format">Formato de Hora</Label>
-                    <Select defaultValue="24h">
-                      <SelectTrigger id="time-format">
-                        <SelectValue placeholder="Selecione o formato de hora" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="24h">24 horas</SelectItem>
-                        <SelectItem value="12h">12 horas (AM/PM)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label htmlFor="timezone">Fuso Horário</Label>
-                    <Select defaultValue="America/Sao_Paulo">
-                      <SelectTrigger id="timezone">
-                        <SelectValue placeholder="Selecione o fuso horário" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="America/Sao_Paulo">
-                          Brasília (GMT-3)
-                        </SelectItem>
-                        <SelectItem value="America/Santiago">
-                          Santiago (GMT-4)
-                        </SelectItem>
-                        <SelectItem value="America/Lima">
-                          Lima (GMT-5)
-                        </SelectItem>
-                        <SelectItem value="America/Bogota">
-                          Bogotá (GMT-5)
-                        </SelectItem>
-                        <SelectItem value="America/New_York">
-                          Nova York (GMT-5)
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <h3 className="text-sm font-medium">Acessibilidade</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Contraste</Label>
+                      <Select
+                        value={preferences.contrast}
+                        onValueChange={(value) =>
+                          setPreferences({ ...preferences, contrast: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o contraste" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="high">Alto</SelectItem>
+                          <SelectItem value="inverted">Invertido</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Palette className="h-4 w-4" />
+                        <Label>Modo Compacto</Label>
+                      </div>
+                      <Switch
+                        checked={preferences.compactMode}
+                        onCheckedChange={(checked) =>
+                          setPreferences({ ...preferences, compactMode: checked })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            <TabsContent value="security" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Segurança</h2>
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações de Segurança</CardTitle>
+                <CardDescription>
+                  Gerencie suas configurações de segurança e privacidade
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="current-password">Senha Atual</Label>
-                    <Input id="current-password" type="password" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">Nova Senha</Label>
-                    <Input id="new-password" type="password" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">
-                      Confirmar Nova Senha
-                    </Label>
-                    <Input id="confirm-password" type="password" />
-                  </div>
-                  <Button>Alterar Senha</Button>
-
-                  <Separator className="my-4" />
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="two-factor">
-                        Autenticação de Dois Fatores
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Aumenta a segurança da sua conta
-                      </p>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Key className="h-4 w-4" />
+                      <Label>Autenticação em Dois Fatores</Label>
                     </div>
-                    <Switch id="two-factor" checked={false} />
+                    <Switch
+                      checked={security.twoFactor}
+                      onCheckedChange={(checked) =>
+                        setSecurity({ ...security, twoFactor: checked })
+                      }
+                    />
                   </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="session-timeout">
-                        Tempo Limite de Sessão
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        Encerrar sessão após período de inatividade
-                      </p>
+
+                  <div className="space-y-2">
+                    <Label>Timeout da Sessão (minutos)</Label>
+                    <Input
+                      type="number"
+                      value={security.sessionTimeout}
+                      onChange={(e) =>
+                        setSecurity({ ...security, sessionTimeout: parseInt(e.target.value) })
+                      }
+                      min={1}
+                      max={120}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Expiração da Senha (dias)</Label>
+                    <Input
+                      type="number"
+                      value={security.passwordExpiry}
+                      onChange={(e) =>
+                        setSecurity({ ...security, passwordExpiry: parseInt(e.target.value) })
+                      }
+                      min={1}
+                      max={365}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tentativas de Login</Label>
+                    <Input
+                      type="number"
+                      value={security.loginAttempts}
+                      onChange={(e) =>
+                        setSecurity({ ...security, loginAttempts: parseInt(e.target.value) })
+                      }
+                      min={1}
+                      max={10}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium">Recursos Avançados de Segurança</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Fingerprint className="h-4 w-4" />
+                        <Label>Autenticação Biométrica</Label>
+                      </div>
+                      <Switch
+                        checked={security.biometric}
+                        onCheckedChange={(checked) =>
+                          setSecurity({ ...security, biometric: checked })
+                        }
+                      />
                     </div>
-                    <Select defaultValue="30">
-                      <SelectTrigger id="session-timeout" className="w-[180px]">
-                        <SelectValue placeholder="Selecione o tempo" />
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Lock className="h-4 w-4" />
+                        <Label>Criptografia de Dados</Label>
+                      </div>
+                      <Switch
+                        checked={security.encryption}
+                        onCheckedChange={(checked) =>
+                          setSecurity({ ...security, encryption: checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <History className="h-4 w-4" />
+                        <Label>Log de Auditoria</Label>
+                      </div>
+                      <Switch
+                        checked={security.auditLog}
+                        onCheckedChange={(checked) =>
+                          setSecurity({ ...security, auditLog: checked })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Frequência de Backup</Label>
+                      <Select
+                        value={security.backupFrequency}
+                        onValueChange={(value) =>
+                          setSecurity({ ...security, backupFrequency: value })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a frequência" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Diário</SelectItem>
+                          <SelectItem value="weekly">Semanal</SelectItem>
+                          <SelectItem value="monthly">Mensal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Integrações do Sistema</CardTitle>
+                <CardDescription>
+                  Gerencie as integrações com outros sistemas e serviços
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Wrench className="h-4 w-4" />
+                      <Label>Manutenção</Label>
+                    </div>
+                    <Switch
+                      checked={integrations.maintenance}
+                      onCheckedChange={(checked) =>
+                        setIntegrations({ ...integrations, maintenance: checked })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Database className="h-4 w-4" />
+                      <Label>Inventário</Label>
+                    </div>
+                    <Switch
+                      checked={integrations.inventory}
+                      onCheckedChange={(checked) =>
+                        setIntegrations({ ...integrations, inventory: checked })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <DollarSign className="h-4 w-4" />
+                      <Label>Financeiro</Label>
+                    </div>
+                    <Switch
+                      checked={integrations.financial}
+                      onCheckedChange={(checked) =>
+                        setIntegrations({ ...integrations, financial: checked })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4" />
+                      <Label>Segurança</Label>
+                    </div>
+                    <Switch
+                      checked={integrations.safety}
+                      onCheckedChange={(checked) =>
+                        setIntegrations({ ...integrations, safety: checked })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium">APIs e Webhooks</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Cloud className="h-4 w-4" />
+                        <Label>API REST</Label>
+                      </div>
+                      <Switch
+                        checked={integrations.api}
+                        onCheckedChange={(checked) =>
+                          setIntegrations({ ...integrations, api: checked })
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-4 w-4" />
+                        <Label>Webhooks</Label>
+                      </div>
+                      <Switch
+                        checked={integrations.webhooks}
+                        onCheckedChange={(checked) =>
+                          setIntegrations({ ...integrations, webhooks: checked })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="advanced" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações Avançadas</CardTitle>
+                <CardDescription>
+                  Ajustes avançados do sistema para usuários experientes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Atenção</AlertTitle>
+                  <AlertDescription>
+                    As configurações avançadas podem afetar o desempenho e a estabilidade do sistema.
+                    Use com cautela.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Bug className="h-4 w-4" />
+                      <Label>Modo Debug</Label>
+                    </div>
+                    <Switch
+                      checked={advanced.debugMode}
+                      onCheckedChange={(checked) =>
+                        setAdvanced({ ...advanced, debugMode: checked })
+                      }
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-4 w-4" />
+                      <Label>Modo de Alto Desempenho</Label>
+                    </div>
+                    <Switch
+                      checked={advanced.performanceMode}
+                      onCheckedChange={(checked) =>
+                        setAdvanced({ ...advanced, performanceMode: checked })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tamanho do Cache (MB)</Label>
+                    <Input
+                      type="number"
+                      value={advanced.cacheSize}
+                      onChange={(e) =>
+                        setAdvanced({ ...advanced, cacheSize: parseInt(e.target.value) })
+                      }
+                      min={50}
+                      max={1000}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Nível de Log</Label>
+                    <Select
+                      value={advanced.logLevel}
+                      onValueChange={(value) =>
+                        setAdvanced({ ...advanced, logLevel: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o nível" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="15">15 minutos</SelectItem>
-                        <SelectItem value="30">30 minutos</SelectItem>
-                        <SelectItem value="60">1 hora</SelectItem>
-                        <SelectItem value="120">2 horas</SelectItem>
-                        <SelectItem value="never">Nunca</SelectItem>
+                        <SelectItem value="debug">Debug</SelectItem>
+                        <SelectItem value="info">Info</SelectItem>
+                        <SelectItem value="warn">Warn</SelectItem>
+                        <SelectItem value="error">Error</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-              </div>
-            </TabsContent>
 
-            <TabsContent value="privacy" className="space-y-6 mt-0">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Privacidade</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="data-collection">Coleta de Dados</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir coleta de dados de uso para melhorias
-                      </p>
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Cloud className="h-4 w-4" />
+                      <Label>Atualização Automática</Label>
                     </div>
-                    <Switch id="data-collection" checked={true} />
+                    <Switch
+                      checked={advanced.autoUpdate}
+                      onCheckedChange={(checked) =>
+                        setAdvanced({ ...advanced, autoUpdate: checked })
+                      }
+                    />
                   </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="cookies">Cookies</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir cookies para melhorar a experiência
-                      </p>
+
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Activity className="h-4 w-4" />
+                      <Label>Telemetria</Label>
                     </div>
-                    <Switch id="cookies" checked={true} />
+                    <Switch
+                      checked={advanced.telemetry}
+                      onCheckedChange={(checked) =>
+                        setAdvanced({ ...advanced, telemetry: checked })
+                      }
+                    />
                   </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="location">Localização</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Permitir acesso à sua localização
-                      </p>
+
+                  <div className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center space-x-2">
+                      <Beaker className="h-4 w-4" />
+                      <Label>Recursos Experimentais</Label>
                     </div>
-                    <Switch id="location" checked={false} />
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label>Exportar Dados</Label>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Baixe uma cópia dos seus dados pessoais
-                    </p>
-                    <Button variant="outline">Exportar Meus Dados</Button>
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Label>Excluir Conta</Label>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Esta ação não pode ser desfeita
-                    </p>
-                    <Button variant="destructive">Excluir Minha Conta</Button>
+                    <Switch
+                      checked={advanced.experimental}
+                      onCheckedChange={(checked) =>
+                        setAdvanced({ ...advanced, experimental: checked })
+                      }
+                    />
                   </div>
                 </div>
-              </div>
-            </TabsContent>
-          </CardContent>
-        </Card>
-      </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </ScrollArea>
+      </Tabs>
     </div>
   );
 };

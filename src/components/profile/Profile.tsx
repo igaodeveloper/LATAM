@@ -1,500 +1,329 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  MapPin,
-  Briefcase,
-  Award,
-  Clock,
-  FileText,
-  Shield,
-} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
+import { Switch } from "../ui/switch";
+import { Calendar, Mail, Phone, MapPin, Globe, Bell, Lock, CreditCard, Plane, Star, Settings, LogOut } from "lucide-react";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState("personal");
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
 
-  // Mock user data
-  const userData = {
-    name: "Carlos Oliveira",
-    role: "Gerente de Operações",
-    email: "carlos.oliveira@latam.com",
-    phone: "+55 11 98765-4321",
-    location: "São Paulo, Brasil",
-    department: "Operações de Voo",
-    joinDate: "15/03/2018",
-    employeeId: "LAT-78945",
-    bio: "Profissional com mais de 10 anos de experiência em operações aéreas, especializado em otimização de rotas e gestão de tripulação.",
-    certifications: [
-      { name: "Gestão de Operações Aéreas", issuer: "IATA", date: "2020" },
-      { name: "Gerenciamento de Crises", issuer: "ANAC", date: "2021" },
-      { name: "Liderança em Aviação", issuer: "LATAM Academy", date: "2022" },
-    ],
-    recentActivity: [
-      { action: "Atualizou status do voo LA1234", date: "Hoje, 14:32" },
+  const user = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Main St, New York, NY 10001',
+    avatar: '/avatars/01.png',
+    role: 'Administrator',
+    department: 'Operations',
+    joinDate: 'Jan 15, 2023',
+    lastLogin: '2 hours ago',
+    status: 'Active',
+    preferences: {
+      language: 'English',
+      timezone: 'UTC-5',
+      notifications: true,
+      twoFactor: true,
+      marketing: false,
+    },
+    bookings: [
       {
-        action: "Aprovou escala de tripulação para 12/09",
-        date: "Ontem, 16:45",
+        id: 'FL123',
+        origin: 'New York',
+        destination: 'London',
+        date: 'Mar 20, 2024',
+        status: 'Confirmed',
       },
       {
-        action: "Gerou relatório de performance operacional",
-        date: "10/09/2023, 09:15",
+        id: 'FL456',
+        origin: 'Paris',
+        destination: 'Tokyo',
+        date: 'Apr 5, 2024',
+        status: 'Pending',
       },
     ],
-    permissions: [
-      { name: "Gerenciamento de Voos", level: "Administrador" },
-      { name: "Alocação de Tripulação", level: "Editor" },
-      { name: "Relatórios Financeiros", level: "Visualizador" },
-      { name: "Manutenção de Aeronaves", level: "Editor" },
-    ],
+    loyalty: {
+      points: 2500,
+      tier: 'Gold',
+      nextTier: 'Platinum',
+      pointsToNext: 500,
+    },
   };
 
   return (
-    <div className="w-full h-full bg-background p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-primary">Meu Perfil</h1>
-          <p className="text-muted-foreground">
-            Gerencie suas informações pessoais e preferências
-          </p>
-        </div>
-        <Button onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? "Salvar Alterações" : "Editar Perfil"}
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="md:col-span-1">
-          <CardContent className="p-6 flex flex-col items-center text-center">
-            <Avatar className="h-32 w-32 mb-4">
-              <AvatarImage
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=latam-carlos"
-                alt={userData.name}
-              />
-              <AvatarFallback>CO</AvatarFallback>
-            </Avatar>
-            <h2 className="text-xl font-bold">{userData.name}</h2>
-            <p className="text-muted-foreground mb-2">{userData.role}</p>
-            <Badge className="mb-4">{userData.department}</Badge>
-
-            <div className="w-full space-y-3 mt-4">
-              <div className="flex items-center">
-                <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">{userData.email}</span>
-              </div>
-              <div className="flex items-center">
-                <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">{userData.phone}</span>
-              </div>
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">{userData.location}</span>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">Desde {userData.joinDate}</span>
-              </div>
-            </div>
-
-            <Separator className="my-4" />
-
-            <div className="w-full">
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-              >
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="personal">Perfil</TabsTrigger>
-                  <TabsTrigger value="activity">Atividade</TabsTrigger>
-                  <TabsTrigger value="access">Acesso</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-3">
-          <CardContent className="p-6">
-            <TabsContent value="personal" className="mt-0 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Informações Pessoais
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full-name">Nome Completo</Label>
-                    <Input
-                      id="full-name"
-                      defaultValue={userData.name}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      defaultValue={userData.email}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Telefone</Label>
-                    <Input
-                      id="phone"
-                      defaultValue={userData.phone}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Localização</Label>
-                    <Input
-                      id="location"
-                      defaultValue={userData.location}
-                      disabled={!isEditing}
-                    />
-                  </div>
+    <div className="container mx-auto py-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="md:col-span-2 space-y-6">
+          {/* Profile Header */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <CardTitle>{user.name}</CardTitle>
+                  <CardDescription>{user.role}</CardDescription>
                 </div>
               </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Informações Profissionais
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="role">Cargo</Label>
-                    <Input
-                      id="role"
-                      defaultValue={userData.role}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="department">Departamento</Label>
-                    <Input
-                      id="department"
-                      defaultValue={userData.department}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="employee-id">ID de Funcionário</Label>
-                    <Input
-                      id="employee-id"
-                      defaultValue={userData.employeeId}
-                      disabled
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="join-date">Data de Admissão</Label>
-                    <Input
-                      id="join-date"
-                      defaultValue={userData.joinDate}
-                      disabled
-                    />
-                  </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label>Department</Label>
+                  <p className="text-sm text-muted-foreground">{user.department}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Join Date</Label>
+                  <p className="text-sm text-muted-foreground">{user.joinDate}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Last Login</Label>
+                  <p className="text-sm text-muted-foreground">{user.lastLogin}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Status</Label>
+                  <Badge variant="success">{user.status}</Badge>
                 </div>
               </div>
+            </CardContent>
+          </Card>
 
-              <Separator />
+          {/* Profile Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
+              <TabsTrigger value="preferences">Preferences</TabsTrigger>
+              <TabsTrigger value="bookings">Bookings</TabsTrigger>
+            </TabsList>
 
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Biografia</h3>
-                <div className="space-y-2">
-                  <Textarea
-                    id="bio"
-                    defaultValue={userData.bio}
-                    disabled={!isEditing}
-                    rows={4}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Certificações</h3>
-                <div className="space-y-4">
-                  {userData.certifications.map((cert, index) => (
-                    <div key={index} className="flex items-start">
-                      <Award className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium">{cert.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {cert.issuer} • {cert.date}
-                        </p>
-                      </div>
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personal Information</CardTitle>
+                  <CardDescription>Update your personal details</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" defaultValue={user.name} />
                     </div>
-                  ))}
-                  {isEditing && (
-                    <Button variant="outline" size="sm" className="mt-2">
-                      <Plus className="h-4 w-4 mr-2" /> Adicionar Certificação
-                    </Button>
-                  )}
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" defaultValue={user.email} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input id="phone" defaultValue={user.phone} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Address</Label>
+                      <Input id="address" defaultValue={user.address} />
+                    </div>
+                  </div>
+                  <Button>Save Changes</Button>
+                </CardContent>
+              </Card>
             </TabsContent>
 
-            <TabsContent value="activity" className="mt-0 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Atividade Recente
-                </h3>
-                <div className="space-y-4">
-                  {userData.recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start">
-                      <Clock className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium">{activity.action}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {activity.date}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Histórico de Login
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <User className="h-5 w-5 mr-2 text-green-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">Login bem-sucedido</h4>
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Security Settings</CardTitle>
+                  <CardDescription>Manage your account security</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label>Two-Factor Authentication</Label>
                       <p className="text-sm text-muted-foreground">
-                        Hoje, 08:45 • São Paulo, Brasil • Chrome em Windows
+                        Add an extra layer of security to your account
                       </p>
                     </div>
+                    <Switch checked={user.preferences.twoFactor} />
                   </div>
-                  <div className="flex items-start">
-                    <User className="h-5 w-5 mr-2 text-green-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">Login bem-sucedido</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Ontem, 17:30 • São Paulo, Brasil • Safari em iPhone
-                      </p>
+                  <Separator />
+                  <div className="space-y-2">
+                    <Label>Change Password</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input type="password" placeholder="Current Password" />
+                      <Input type="password" placeholder="New Password" />
                     </div>
+                    <Button>Update Password</Button>
                   </div>
-                  <div className="flex items-start">
-                    <User className="h-5 w-5 mr-2 text-green-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">Login bem-sucedido</h4>
-                      <p className="text-sm text-muted-foreground">
-                        10/09/2023, 09:12 • São Paulo, Brasil • Chrome em
-                        Windows
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Relatórios Gerados
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <FileText className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">
-                        Relatório de Performance Operacional
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        10/09/2023, 09:15
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <FileText className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">
-                        Análise de Eficiência de Rotas
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        05/09/2023, 14:22
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <FileText className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium">
-                        Relatório de Utilização de Aeronaves
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        01/09/2023, 11:05
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
-            <TabsContent value="access" className="mt-0 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Permissões e Acesso
-                </h3>
-                <div className="space-y-4">
-                  {userData.permissions.map((permission, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start justify-between"
-                    >
-                      <div className="flex items-start">
-                        <Shield className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium">{permission.name}</h4>
+            {/* Preferences Tab */}
+            <TabsContent value="preferences" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Preferences</CardTitle>
+                  <CardDescription>Customize your account settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Language</Label>
+                      <Select defaultValue={user.preferences.language}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="es">Spanish</SelectItem>
+                          <SelectItem value="fr">French</SelectItem>
+                          <SelectItem value="de">German</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Timezone</Label>
+                      <Select defaultValue={user.preferences.timezone}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select timezone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="utc-5">UTC-5 (EST)</SelectItem>
+                          <SelectItem value="utc-8">UTC-8 (PST)</SelectItem>
+                          <SelectItem value="utc+0">UTC+0 (GMT)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Email Notifications</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive notifications about your account
+                        </p>
+                      </div>
+                      <Switch checked={user.preferences.notifications} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Marketing Emails</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive updates about new features and promotions
+                        </p>
+                      </div>
+                      <Switch checked={user.preferences.marketing} />
+                    </div>
+                  </div>
+                  <Button>Save Preferences</Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Bookings Tab */}
+            <TabsContent value="bookings" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Bookings</CardTitle>
+                  <CardDescription>View and manage your flight bookings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {user.bookings.map((booking) => (
+                      <div
+                        key={booking.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <Plane className="h-4 w-4" />
+                            <span className="font-medium">{booking.id}</span>
+                          </div>
                           <p className="text-sm text-muted-foreground">
-                            Nível de acesso: {permission.level}
+                            {booking.origin} → {booking.destination}
                           </p>
+                          <p className="text-sm text-muted-foreground">{booking.date}</p>
                         </div>
+                        <Badge variant={booking.status === 'Confirmed' ? 'success' : 'warning'}>
+                          {booking.status}
+                        </Badge>
                       </div>
-                      {isEditing && (
-                        <Button variant="ghost" size="sm">
-                          Editar
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Dispositivos Conectados
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 mr-2 text-green-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium">
-                          Windows PC (Este dispositivo)
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          São Paulo, Brasil • Último acesso: Agora
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      Desconectar
-                    </Button>
+                    ))}
                   </div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium">iPhone</h4>
-                        <p className="text-sm text-muted-foreground">
-                          São Paulo, Brasil • Último acesso: Ontem, 17:30
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      Desconectar
-                    </Button>
-                  </div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start">
-                      <Briefcase className="h-5 w-5 mr-2 text-blue-500 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium">MacBook Pro</h4>
-                        <p className="text-sm text-muted-foreground">
-                          São Paulo, Brasil • Último acesso: 08/09/2023, 10:15
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      Desconectar
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-lg font-semibold mb-4">
-                  Segurança da Conta
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Alterar Senha</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Atualize sua senha para maior segurança
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Alterar
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">
-                        Autenticação de Dois Fatores
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Adicione uma camada extra de segurança
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Configurar
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Sessões Ativas</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Gerencie suas sessões ativas
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Visualizar
-                    </Button>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </TabsContent>
-          </CardContent>
-        </Card>
+          </Tabs>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Loyalty Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Loyalty Status</CardTitle>
+              <CardDescription>Your rewards and benefits</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label>Current Tier</Label>
+                  <p className="text-sm font-medium">{user.loyalty.tier}</p>
+                </div>
+                <Star className="h-5 w-5 text-yellow-500" />
+              </div>
+              <div className="space-y-1">
+                <Label>Points Balance</Label>
+                <p className="text-2xl font-bold">{user.loyalty.points}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.loyalty.pointsToNext} points to {user.loyalty.nextTier}
+                </p>
+              </div>
+              <Button variant="outline" className="w-full">
+                View Benefits
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Button variant="outline" className="w-full justify-start">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Account Settings
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Payment Methods
+                </Button>
+                <Button variant="outline" className="w-full justify-start">
+                  <Bell className="mr-2 h-4 w-4" />
+                  Notification Settings
+                </Button>
+                <Button variant="destructive" className="w-full justify-start">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

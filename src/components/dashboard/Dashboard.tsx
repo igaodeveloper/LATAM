@@ -29,6 +29,7 @@ import {
   MapPin,
   TrendingUp,
   TrendingDown,
+  Bell,
 } from "lucide-react";
 import AlertsPanel from "./AlertsPanel";
 import FlightStatusOverview from "./FlightStatusOverview";
@@ -99,691 +100,314 @@ const Dashboard = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const stats = [
+    {
+      title: "Total de Voos",
+      value: "856",
+      change: "+8.2%",
+      trend: "up",
+      icon: Plane,
+      color: "text-blue-500",
+    },
+    {
+      title: "Vendas Totais",
+      value: "R$ 2.5M",
+      change: "+15.3%",
+      trend: "up",
+      icon: DollarSign,
+      color: "text-green-500",
+    },
+    {
+      title: "Clientes Ativos",
+      value: "1,234",
+      change: "+12.5%",
+      trend: "up",
+      icon: Users,
+      color: "text-purple-500",
+    },
+    {
+      title: "Taxa de Satisfação",
+      value: "94%",
+      change: "+2.1%",
+      trend: "up",
+      icon: Star,
+      color: "text-yellow-500",
+    },
+  ];
+
+  const recentFlights = [
+    {
+      id: "FL001",
+      flight: "LA1234",
+      origin: "São Paulo",
+      destination: "Rio de Janeiro",
+      status: "completed",
+      time: "10:30",
+      date: "2024-03-15",
+    },
+    {
+      id: "FL002",
+      flight: "LA5678",
+      origin: "Brasília",
+      destination: "Salvador",
+      status: "in_progress",
+      time: "11:45",
+      date: "2024-03-15",
+    },
+    {
+      id: "FL003",
+      flight: "LA9012",
+      origin: "Recife",
+      destination: "Fortaleza",
+      status: "scheduled",
+      time: "13:15",
+      date: "2024-03-15",
+    },
+    {
+      id: "FL004",
+      flight: "LA3456",
+      origin: "Manaus",
+      destination: "Belém",
+      status: "delayed",
+      time: "14:30",
+      date: "2024-03-15",
+    },
+  ];
+
+  const notifications = [
+    {
+      id: "NT001",
+      title: "Novo Voo Agendado",
+      message: "Voo LA1234 para Rio de Janeiro foi agendado",
+      type: "info",
+      time: "10:30",
+      read: false,
+    },
+    {
+      id: "NT002",
+      title: "Manutenção Programada",
+      message: "Manutenção preventiva agendada para amanhã",
+      type: "warning",
+      time: "09:15",
+      read: true,
+    },
+    {
+      id: "NT003",
+      title: "Novo Cliente",
+      message: "Novo cliente registrado no sistema",
+      type: "success",
+      time: "08:45",
+      read: true,
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in_progress":
+        return "bg-blue-100 text-blue-800";
+      case "scheduled":
+        return "bg-yellow-100 text-yellow-800";
+      case "delayed":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case "info":
+        return "text-blue-500";
+      case "warning":
+        return "text-yellow-500";
+      case "success":
+        return "text-green-500";
+      default:
+        return "text-gray-500";
+    }
+  };
+
   return (
-    <div className="w-full h-full bg-gray-50 p-6 pt-0">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-900 animate-fade-in">
-            Dashboard Operacional
-          </h1>
-          <p
-            className="text-gray-600 animate-fade-in"
-            style={{ animationDelay: "0.1s" }}
-          >
-            Visão geral das operações da LATAM Airlines
-          </p>
-        </div>
-        <div
-          className="flex items-center space-x-2 animate-fade-in"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <Select value={timeframe} onValueChange={setTimeframe}>
-            <SelectTrigger className="w-[150px]">
-              <Calendar className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Hoje</SelectItem>
-              <SelectItem value="yesterday">Ontem</SelectItem>
-              <SelectItem value="week">Esta Semana</SelectItem>
-              <SelectItem value="month">Este Mês</SelectItem>
-              <SelectItem value="quarter">Este Trimestre</SelectItem>
-              <SelectItem value="year">Este Ano</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Atualizar
-          </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="h-4 w-4" />
-            Exportar
-          </Button>
-        </div>
+    <div className="container mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-500">
+          Visão geral do sistema
+        </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8 bg-white shadow-sm">
-          <TabsTrigger value="overview" className="gap-2 py-3">
-            <BarChart size={16} />
-            Visão Geral
-          </TabsTrigger>
-          <TabsTrigger value="flights" className="gap-2 py-3">
-            <Plane size={16} />
-            Voos
-          </TabsTrigger>
-          <TabsTrigger value="fleet" className="gap-2 py-3">
-            <Wrench size={16} />
-            Frota
-          </TabsTrigger>
-          <TabsTrigger value="crew" className="gap-2 py-3">
-            <Users size={16} />
-            Tripulação
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard
-              title="Voos Hoje"
-              value="328"
-              change={5.2}
-              trend="up"
-              icon={<Plane size={24} />}
-              color="blue"
-            />
-            <KPICard
-              title="Pontualidade"
-              value="92.7%"
-              change={3.5}
-              trend="up"
-              icon={<Clock size={24} />}
-              color="green"
-            />
-            <KPICard
-              title="Aeronaves Disponíveis"
-              value="85"
-              change={-2.3}
-              trend="down"
-              icon={<Wrench size={24} />}
-              color="amber"
-            />
-            <KPICard
-              title="Ocupação Média"
-              value="87.4%"
-              change={1.8}
-              trend="up"
-              icon={<Users size={24} />}
-              color="purple"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 shadow-md hover:shadow-lg transition-all duration-300">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle>Status dos Voos</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Select defaultValue="all">
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Filtrar por rota" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas as Rotas</SelectItem>
-                      <SelectItem value="domestic">Domésticas</SelectItem>
-                      <SelectItem value="international">
-                        Internacionais
-                      </SelectItem>
-                      <SelectItem value="regional">Regionais</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="icon">
-                    <Filter size={16} />
-                  </Button>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {stat.value}
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[350px] border rounded-lg p-8 text-center bg-muted/10 relative overflow-hidden">
-                  {isLoading ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                      <div className="flex flex-col items-center">
-                        <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />
-                        <p className="mt-2 text-sm text-gray-500">
-                          Carregando dados...
+                <div className={`flex items-center space-x-1 ${
+                  stat.trend === "up" ? "text-green-500" : "text-red-500"
+                }`}>
+                  <TrendingUp className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    {stat.change}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Voos Recentes</CardTitle>
+                  <CardDescription>
+                    Últimos voos do sistema
+                  </CardDescription>
+                </div>
+                <Select value={timeframe} onValueChange={setTimeframe}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Período" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="today">Hoje</SelectItem>
+                    <SelectItem value="week">Esta Semana</SelectItem>
+                    <SelectItem value="month">Este Mês</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentFlights.map((flight) => (
+                  <div
+                    key={flight.id}
+                    className="flex items-center justify-between p-4 rounded-lg border"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="p-2 bg-gray-100 rounded-lg">
+                        <Plane className="h-5 w-5 text-gray-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{flight.flight}</h3>
+                        <p className="text-sm text-gray-500">
+                          {flight.origin} → {flight.destination}
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    <>
-                      <BarChart className="h-16 w-16 mx-auto text-blue-500 mb-4" />
-                      <p className="text-gray-500">
-                        Gráfico interativo mostrando o status dos voos em tempo
-                        real seria exibido aqui.
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  <div className="flex flex-col items-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">285</div>
-                    <div className="text-sm text-gray-500">No Horário</div>
-                  </div>
-                  <div className="flex flex-col items-center p-3 bg-amber-50 rounded-lg">
-                    <div className="text-2xl font-bold text-amber-600">32</div>
-                    <div className="text-sm text-gray-500">Atrasados</div>
-                  </div>
-                  <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">8</div>
-                    <div className="text-sm text-gray-500">Cancelados</div>
-                  </div>
-                  <div className="flex flex-col items-center p-3 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">3</div>
-                    <div className="text-sm text-gray-500">Desviados</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-md hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle>Alertas Operacionais</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-red-50 animate-pulse hover:animate-none transition-all">
-                    <div className="rounded-full bg-red-100 p-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Manutenção Urgente</div>
-                      <div className="text-sm text-gray-600">
-                        Aeronave CC-COP requer inspeção imediata
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{flight.time}</p>
+                        <p className="text-sm text-gray-500">{flight.date}</p>
                       </div>
-                      <div className="mt-2">
-                        <Button size="sm" variant="destructive">
-                          Verificar
-                        </Button>
-                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(flight.status)}`}>
+                        {flight.status === "completed" ? "Concluído" :
+                         flight.status === "in_progress" ? "Em Andamento" :
+                         flight.status === "scheduled" ? "Agendado" : "Atrasado"}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-amber-50">
-                    <div className="rounded-full bg-amber-100 p-2">
-                      <Clock className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Atrasos em Cascata</div>
-                      <div className="text-sm text-gray-600">
-                        Possíveis atrasos em 5 voos conectados
-                      </div>
-                      <div className="mt-2">
-                        <Button size="sm" variant="outline">
-                          Revisar
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
-                    <div className="rounded-full bg-blue-100 p-2">
-                      <MapPin className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Condições Climáticas</div>
-                      <div className="text-sm text-gray-600">
-                        Neblina em SCL pode afetar chegadas
-                      </div>
-                      <div className="mt-2">
-                        <Button size="sm" variant="outline">
-                          Monitorar
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="shadow-md hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle>Desempenho por Rota</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-green-100 text-green-800">1</Badge>
-                      <span>Santiago - Lima</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">96.2%</span>
-                      <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
-                        <TrendingUp size={12} /> 3.1%
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-green-100 text-green-800">2</Badge>
-                      <span>Santiago - Buenos Aires</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">94.8%</span>
-                      <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
-                        <TrendingUp size={12} /> 1.7%
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-green-100 text-green-800">3</Badge>
-                      <span>Santiago - São Paulo</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">93.5%</span>
-                      <Badge className="bg-green-100 text-green-800 flex items-center gap-1">
-                        <TrendingUp size={12} /> 0.8%
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-red-100 text-red-800">8</Badge>
-                      <span>Santiago - Miami</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">78.3%</span>
-                      <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
-                        <TrendingDown size={12} /> 4.2%
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-md hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle>Métricas Financeiras</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-gray-500">Receita Diária</div>
-                    <div className="text-2xl font-bold text-blue-700 mt-1">
-                      $3.2M
-                    </div>
-                    <div className="flex items-center mt-1 text-green-600 text-xs">
-                      <TrendingUp size={12} className="mr-1" /> +5.2%
-                    </div>
-                  </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <div className="text-sm text-gray-500">Ocupação Média</div>
-                    <div className="text-2xl font-bold text-green-700 mt-1">
-                      87.4%
-                    </div>
-                    <div className="flex items-center mt-1 text-green-600 text-xs">
-                      <TrendingUp size={12} className="mr-1" /> +1.8%
-                    </div>
-                  </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-gray-500">
-                      Receita/Passageiro
-                    </div>
-                    <div className="text-2xl font-bold text-purple-700 mt-1">
-                      $215
-                    </div>
-                    <div className="flex items-center mt-1 text-green-600 text-xs">
-                      <TrendingUp size={12} className="mr-1" /> +2.3%
-                    </div>
-                  </div>
-                  <div className="p-4 bg-amber-50 rounded-lg">
-                    <div className="text-sm text-gray-500">
-                      Custo/Assento-Km
-                    </div>
-                    <div className="text-2xl font-bold text-amber-700 mt-1">
-                      $0.082
-                    </div>
-                    <div className="flex items-center mt-1 text-red-600 text-xs">
-                      <TrendingDown size={12} className="mr-1" /> -1.5%
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="flights" className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard
-              title="Total de Voos"
-              value="328"
-              change={5.2}
-              trend="up"
-              icon={<Plane size={24} />}
-              color="blue"
-            />
-            <KPICard
-              title="Pontualidade"
-              value="92.7%"
-              change={3.5}
-              trend="up"
-              icon={<Clock size={24} />}
-              color="green"
-            />
-            <KPICard
-              title="Taxa de Cancelamento"
-              value="2.4%"
-              change={-0.8}
-              trend="down"
-              icon={<AlertTriangle size={24} />}
-              color="red"
-            />
-            <KPICard
-              title="Atraso Médio"
-              value="18 min"
-              change={-2.5}
-              trend="down"
-              icon={<Clock size={24} />}
-              color="amber"
-            />
-          </div>
-
-          <Card className="shadow-md hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle>Status dos Voos em Tempo Real</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] border rounded-lg p-8 text-center bg-muted/10 relative overflow-hidden">
-                {isLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                    <div className="flex flex-col items-center">
-                      <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />
-                      <p className="mt-2 text-sm text-gray-500">
-                        Carregando dados...
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <BarChart className="h-16 w-16 mx-auto text-blue-500 mb-4" />
-                    <p className="text-gray-500">
-                      Mapa interativo mostrando voos em tempo real seria exibido
-                      aqui.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4">Próximos Voos</h3>
-                <div className="space-y-4">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div>
-                      <div className="flex items-center">
-                        <span className="font-bold text-lg mr-2">LA1234</span>
-                        <Badge className="bg-green-100 text-green-800">
-                          No Horário
-                        </Badge>
-                      </div>
-                      <div className="flex items-center mt-2">
-                        <MapPin size={16} className="mr-1 text-gray-400" />
-                        <span>Santiago (SCL) → Lima (LIM)</span>
-                      </div>
-                    </div>
-                    <div className="mt-2 md:mt-0">
-                      <div className="flex items-center">
-                        <Clock size={16} className="mr-1 text-gray-400" />
-                        <span>08:30 - 10:45</span>
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        Boeing 787-9 • Portão A12
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div>
-                      <div className="flex items-center">
-                        <span className="font-bold text-lg mr-2">LA2156</span>
-                        <Badge className="bg-amber-100 text-amber-800">
-                          Atrasado
-                        </Badge>
-                      </div>
-                      <div className="flex items-center mt-2">
-                        <MapPin size={16} className="mr-1 text-gray-400" />
-                        <span>Buenos Aires (EZE) → Santiago (SCL)</span>
-                      </div>
-                    </div>
-                    <div className="mt-2 md:mt-0">
-                      <div className="flex items-center">
-                        <Clock size={16} className="mr-1 text-gray-400" />
-                        <span>09:15 - 11:00</span>
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        Airbus A320 • Portão B05
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div>
-                      <div className="flex items-center">
-                        <span className="font-bold text-lg mr-2">LA3421</span>
-                        <Badge className="bg-blue-100 text-blue-800">
-                          Embarque
-                        </Badge>
-                      </div>
-                      <div className="flex items-center mt-2">
-                        <MapPin size={16} className="mr-1 text-gray-400" />
-                        <span>São Paulo (GRU) → Bogotá (BOG)</span>
-                      </div>
-                    </div>
-                    <div className="mt-2 md:mt-0">
-                      <div className="flex items-center">
-                        <Clock size={16} className="mr-1 text-gray-400" />
-                        <span>10:00 - 14:30</span>
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        Boeing 787-8 • Portão C22
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="fleet" className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard
-              title="Total de Aeronaves"
-              value="142"
-              change={2.1}
-              trend="up"
-              icon={<Plane size={24} />}
-              color="blue"
-            />
-            <KPICard
-              title="Disponíveis"
-              value="85"
-              change={-2.3}
-              trend="down"
-              icon={<CheckCircle size={24} />}
-              color="green"
-            />
-            <KPICard
-              title="Em Manutenção"
-              value="12"
-              change={5.0}
-              trend="up"
-              icon={<Wrench size={24} />}
-              color="amber"
-            />
-            <KPICard
-              title="Utilização Diária"
-              value="11.2h"
-              change={0.8}
-              trend="up"
-              icon={<Clock size={24} />}
-              color="purple"
-            />
-          </div>
-
-          <Card className="shadow-md hover:shadow-lg transition-all duration-300">
+        <div className="md:col-span-1">
+          <Card>
             <CardHeader>
-              <CardTitle>Status da Frota</CardTitle>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Notificações</CardTitle>
+                  <CardDescription>
+                    Alertas e atualizações
+                  </CardDescription>
+                </div>
+                <Button variant="ghost" size="icon">
+                  <Bell className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px] border rounded-lg p-8 text-center bg-muted/10 relative overflow-hidden">
-                {isLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                    <div className="flex flex-col items-center">
-                      <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />
-                      <p className="mt-2 text-sm text-gray-500">
-                        Carregando dados...
+              <div className="space-y-4">
+                {notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`flex items-start space-x-3 p-3 rounded-lg ${
+                      notification.read ? "bg-white" : "bg-blue-50"
+                    }`}
+                  >
+                    <div className={`p-1 rounded-full ${
+                      notification.read ? "bg-gray-100" : "bg-blue-100"
+                    }`}>
+                      <Bell className={`h-4 w-4 ${getNotificationColor(notification.type)}`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">
+                          {notification.title}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {notification.time}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {notification.message}
                       </p>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <BarChart className="h-16 w-16 mx-auto text-blue-500 mb-4" />
-                    <p className="text-gray-500">
-                      Gráfico interativo mostrando o status da frota seria
-                      exibido aqui.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4">
-                  Alertas de Manutenção
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-red-50">
-                    <div className="rounded-full bg-red-100 p-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        CC-COP - Boeing 777-300ER
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Manutenção programada vencida desde 20/07/2023
-                      </div>
-                    </div>
-                    <Button size="sm">Agendar</Button>
-                  </div>
-
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-amber-50">
-                    <div className="rounded-full bg-amber-100 p-2">
-                      <Clock className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">CC-EFG - Airbus A320neo</div>
-                      <div className="text-sm text-gray-600">
-                        Manutenção programada para 12/09/2023
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Detalhes
-                    </Button>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+      </div>
 
-        <TabsContent value="crew" className="space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard
-              title="Total de Tripulantes"
-              value="1,245"
-              change={3.2}
-              trend="up"
-              icon={<Users size={24} />}
-              color="blue"
-            />
-            <KPICard
-              title="Disponíveis"
-              value="865"
-              change={-1.5}
-              trend="down"
-              icon={<CheckCircle size={24} />}
-              color="green"
-            />
-            <KPICard
-              title="Em Serviço"
-              value="320"
-              change={4.8}
-              trend="up"
-              icon={<Plane size={24} />}
-              color="purple"
-            />
-            <KPICard
-              title="Em Descanso"
-              value="60"
-              change={2.3}
-              trend="up"
-              icon={<Clock size={24} />}
-              color="amber"
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Vendas por Período</CardTitle>
+            <CardDescription>
+              Análise de vendas
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <LineChart className="h-8 w-8 text-gray-400" />
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="shadow-md hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle>Alocação de Tripulação</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] border rounded-lg p-8 text-center bg-muted/10 relative overflow-hidden">
-                {isLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                    <div className="flex flex-col items-center">
-                      <RefreshCw className="h-8 w-8 text-blue-500 animate-spin" />
-                      <p className="mt-2 text-sm text-gray-500">
-                        Carregando dados...
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <BarChart className="h-16 w-16 mx-auto text-blue-500 mb-4" />
-                    <p className="text-gray-500">
-                      Gráfico interativo mostrando a alocação de tripulação
-                      seria exibido aqui.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-medium mb-4">
-                  Alertas de Tripulação
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-red-50">
-                    <div className="rounded-full bg-red-100 p-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        LA5678 - Falta de Piloto
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Voo para Buenos Aires precisa de 1 piloto adicional
-                      </div>
-                    </div>
-                    <Button size="sm">Alocar</Button>
-                  </div>
-
-                  <div className="flex items-start space-x-4 p-4 border rounded-lg bg-amber-50">
-                    <div className="rounded-full bg-amber-100 p-2">
-                      <Clock className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        LA1234 - Tripulação Incompleta
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Voo para Lima precisa de 2 comissários adicionais
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Alocar
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribuição de Vendas</CardTitle>
+            <CardDescription>
+              Análise de distribuição
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <PieChart className="h-8 w-8 text-gray-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
