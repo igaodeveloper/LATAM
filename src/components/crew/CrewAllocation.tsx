@@ -1,482 +1,267 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  UserCircle,
-  Users,
-  Calendar,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Filter,
-  Search,
-  Plus,
-  Edit,
-} from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Plus, Search, Filter, Edit, Trash2, UserPlus } from "lucide-react";
 
 interface CrewMember {
   id: string;
   name: string;
-  position: string;
+  role: "pilot" | "copilot" | "flight-attendant" | "ground-crew";
+  status: "available" | "assigned" | "off-duty" | "training";
+  currentFlight?: string;
+  nextDuty?: string;
   qualifications: string[];
-  availability: "available" | "on-duty" | "rest-period" | "leave";
-  hoursWorked: number;
-  nextAvailable?: string;
-  image: string;
 }
 
-interface Flight {
-  id: string;
-  flightNumber: string;
-  origin: string;
-  destination: string;
-  departureTime: string;
-  arrivalTime: string;
-  aircraft: string;
-  status:
-    | "scheduled"
-    | "boarding"
-    | "in-flight"
-    | "arrived"
-    | "delayed"
-    | "cancelled";
-  crew: CrewMember[];
-}
+const CrewAllocation = () => {
+  const [crewMembers, setCrewMembers] = useState<CrewMember[]>([
+    {
+      id: "1",
+      name: "João Silva",
+      role: "pilot",
+      status: "available",
+      qualifications: ["Boeing 737", "Airbus A320"],
+    },
+    {
+      id: "2",
+      name: "Maria Santos",
+      role: "copilot",
+      status: "assigned",
+      currentFlight: "LA1234",
+      nextDuty: "2024-03-26 08:00",
+      qualifications: ["Boeing 737", "Airbus A320"],
+    },
+    // Add more sample crew members as needed
+  ]);
 
-const CrewAllocation = ({
-  flights = defaultFlights,
-  crewMembers = defaultCrewMembers,
-}: {
-  flights?: Flight[];
-  crewMembers?: CrewMember[];
-}) => {
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-  const [selectedCrewMember, setSelectedCrewMember] =
-    useState<CrewMember | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterPosition, setFilterPosition] = useState("all");
-  const [filterAvailability, setFilterAvailability] = useState("all");
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
-  // Filter crew members based on search and filters
-  const filteredCrewMembers = crewMembers.filter((crew) => {
-    const matchesSearch = crew.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesPosition =
-      filterPosition === "all" || crew.position === filterPosition;
-    const matchesAvailability =
-      filterAvailability === "all" || crew.availability === filterAvailability;
-    return matchesSearch && matchesPosition && matchesAvailability;
+  const filteredCrew = crewMembers.filter((member) => {
+    const matchesSearch =
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.role.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "all" || member.role === roleFilter;
+    const matchesStatus = statusFilter === "all" || member.status === statusFilter;
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleAssignCrew = (crewMember: CrewMember) => {
-    setSelectedCrewMember(crewMember);
-    setDialogOpen(true);
+  const getStatusColor = (status: CrewMember["status"]) => {
+    const colors = {
+      available: "bg-green-100 text-green-800",
+      assigned: "bg-blue-100 text-blue-800",
+      "off-duty": "bg-gray-100 text-gray-800",
+      training: "bg-yellow-100 text-yellow-800",
+    };
+    return colors[status];
   };
 
-  const confirmAssignment = () => {
-    // In a real implementation, this would update the flight's crew list
-    setDialogOpen(false);
-    setSelectedCrewMember(null);
-  };
-
-  const getAvailabilityColor = (availability: string) => {
-    switch (availability) {
-      case "available":
-        return "bg-green-100 text-green-800";
-      case "on-duty":
-        return "bg-blue-100 text-blue-800";
-      case "rest-period":
-        return "bg-orange-100 text-orange-800";
-      case "leave":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getRoleLabel = (role: CrewMember["role"]) => {
+    const labels = {
+      pilot: "Piloto",
+      copilot: "Copiloto",
+      "flight-attendant": "Comissário(a)",
+      "ground-crew": "Equipe de Solo",
+    };
+    return labels[role];
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Alocação de Tripulação</h1>
-        <p className="text-gray-500">Gerencie tripulantes e escalas de voo</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="md:col-span-3">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Pesquisar tripulantes..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-[300px]"
-                    />
-                  </div>
-                  <Select value={filterPosition} onValueChange={setFilterPosition}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Função" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="Captain">Comandante</SelectItem>
-                      <SelectItem value="First Officer">Copiloto</SelectItem>
-                      <SelectItem value="Flight Attendant">Comissário</SelectItem>
-                      <SelectItem value="Purser">Purser</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={filterAvailability} onValueChange={setFilterAvailability}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="available">Disponíveis</SelectItem>
-                      <SelectItem value="on-duty">Em Serviço</SelectItem>
-                      <SelectItem value="rest-period">Descanso</SelectItem>
-                      <SelectItem value="leave">Folga</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Alocação
-                </Button>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Alocação de Tripulação</h1>
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <UserPlus className="w-4 h-4 mr-2" />
+              Novo Membro
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Adicionar Novo Membro da Tripulação</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input id="name" placeholder="Nome completo" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Função</TableHead>
-                    <TableHead>Voo</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Próximo Voo</TableHead>
-                    <TableHead>Horas</TableHead>
-                    <TableHead>Base</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {crewMembers.map((crew) => (
-                    <TableRow key={crew.id}>
-                      <TableCell className="font-medium">{crew.id}</TableCell>
-                      <TableCell>{crew.name}</TableCell>
-                      <TableCell>{crew.position}</TableCell>
-                      <TableCell>{selectedFlight?.flightNumber}</TableCell>
-                      <TableCell>
-                        <div
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityColor(
-                            crew.availability
-                          )}`}
-                        >
-                          {crew.availability === "available" ? (
-                            <Clock className="h-4 w-4" />
-                          ) : crew.availability === "on-duty" ? (
-                            <CheckCircle className="h-4 w-4" />
-                          ) : crew.availability === "rest-period" ? (
-                            <AlertCircle className="h-4 w-4" />
-                          ) : (
-                            <AlertCircle className="h-4 w-4" />
-                          )}
-                          <span className="ml-1">
-                            {crew.availability === "available" ? "Disponível" :
-                              crew.availability === "on-duty" ? "Em Serviço" :
-                              crew.availability === "rest-period" ? "Descanso" : "Folga"}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {selectedFlight ? format(new Date(selectedFlight.departureTime), "HH:mm", { locale: ptBR }) : "Não alocado"}
-                      </TableCell>
-                      <TableCell>{selectedFlight?.origin} → {selectedFlight?.destination}</TableCell>
-                      <TableCell>{selectedFlight?.aircraft}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => handleAssignCrew(crew)}>
-                          Detalhes
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumo</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Total de Tripulantes</span>
-                  <span className="font-semibold">{crewMembers.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Alocados</span>
-                  <span className="font-semibold text-green-600">{selectedFlight?.crew.length || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Disponíveis</span>
-                  <span className="font-semibold text-blue-600">{crewMembers.length - (selectedFlight?.crew.length || 0)}</span>
-                </div>
+              <div className="grid gap-2">
+                <Label htmlFor="role">Função</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a função" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pilot">Piloto</SelectItem>
+                    <SelectItem value="copilot">Copiloto</SelectItem>
+                    <SelectItem value="flight-attendant">Comissário(a)</SelectItem>
+                    <SelectItem value="ground-crew">Equipe de Solo</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="pt-4 border-t">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Média de Horas</span>
-                  <span className="font-semibold">{selectedFlight ? (selectedFlight.crew.reduce((total, crew) => total + crew.hoursWorked, 0) / selectedFlight.crew.length).toFixed(2) : "Não alocado"}</span>
-                </div>
-                <div className="flex justify-between mt-2">
-                  <span className="text-gray-500">Voos Sem Tripulação</span>
-                  <span className="font-semibold text-red-600">{flights.length - selectedFlight?.crew.length || 0}</span>
-                </div>
+              <div className="grid gap-2">
+                <Label htmlFor="status">Status</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">Disponível</SelectItem>
+                    <SelectItem value="assigned">Alocado</SelectItem>
+                    <SelectItem value="off-duty">Fora de Serviço</SelectItem>
+                    <SelectItem value="training">Em Treinamento</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Alertas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-2">
-                  <AlertCircle className="h-4 w-4 text-yellow-500 mt-1" />
-                  <div>
-                    <p className="text-sm font-medium">Voo {selectedFlight?.flightNumber} Sem Tripulação</p>
-                    <p className="text-xs text-gray-500">
-                      Necessário alocar tripulação
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <AlertCircle className="h-4 w-4 text-red-500 mt-1" />
-                  <div>
-                    <p className="text-sm font-medium">Excesso de Horas</p>
-                    <p className="text-xs text-gray-500">
-                      3 tripulantes próximos do limite
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Assignment Confirmation Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Crew Assignment</DialogTitle>
-          </DialogHeader>
-          {selectedCrewMember && selectedFlight && (
-            <div className="py-4">
-              <p className="mb-4">
-                Are you sure you want to assign{" "}
-                <strong>{selectedCrewMember.name}</strong> to flight{" "}
-                <strong>{selectedFlight.flightNumber}</strong>?
-              </p>
-
-              <div className="bg-blue-50 p-3 rounded-md mb-4">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full overflow-hidden mr-3">
-                    <img
-                      src={selectedCrewMember.image}
-                      alt={selectedCrewMember.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <div className="font-medium">{selectedCrewMember.name}</div>
-                    <div className="text-sm text-gray-500">
-                      {selectedCrewMember.position}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-3 rounded-md mb-4">
-                <div className="text-sm">
-                  <div>
-                    <strong>Flight:</strong> {selectedFlight.flightNumber}
-                  </div>
-                  <div>
-                    <strong>Route:</strong> {selectedFlight.origin} →{" "}
-                    {selectedFlight.destination}
-                  </div>
-                  <div>
-                    <strong>Departure:</strong> {selectedFlight.departureTime}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2 mt-6">
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={confirmAssignment}>Confirm Assignment</Button>
+              <div className="grid gap-2">
+                <Label htmlFor="qualifications">Qualificações</Label>
+                <Input
+                  id="qualifications"
+                  placeholder="Ex: Boeing 737, Airbus A320"
+                />
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={() => setShowAddDialog(false)}>Salvar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex gap-4 mb-6">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Buscar tripulantes..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Filtrar por função" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas as Funções</SelectItem>
+            <SelectItem value="pilot">Piloto</SelectItem>
+            <SelectItem value="copilot">Copiloto</SelectItem>
+            <SelectItem value="flight-attendant">Comissário(a)</SelectItem>
+            <SelectItem value="ground-crew">Equipe de Solo</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os Status</SelectItem>
+            <SelectItem value="available">Disponível</SelectItem>
+            <SelectItem value="assigned">Alocado</SelectItem>
+            <SelectItem value="off-duty">Fora de Serviço</SelectItem>
+            <SelectItem value="training">Em Treinamento</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead>Função</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Voo Atual</TableHead>
+              <TableHead>Próxima Escala</TableHead>
+              <TableHead>Qualificações</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCrew.map((member) => (
+              <TableRow key={member.id}>
+                <TableCell className="font-medium">{member.name}</TableCell>
+                <TableCell>{getRoleLabel(member.role)}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      member.status
+                    )}`}
+                  >
+                    {member.status === "available"
+                      ? "Disponível"
+                      : member.status === "assigned"
+                      ? "Alocado"
+                      : member.status === "off-duty"
+                      ? "Fora de Serviço"
+                      : "Em Treinamento"}
+                  </span>
+                </TableCell>
+                <TableCell>{member.currentFlight || "-"}</TableCell>
+                <TableCell>{member.nextDuty || "-"}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {member.qualifications.map((qual, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs"
+                      >
+                        {qual}
+                      </span>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon">
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
-
-// Default mock data
-const defaultCrewMembers: CrewMember[] = [
-  {
-    id: "1",
-    name: "Carlos Rodriguez",
-    position: "Captain",
-    qualifications: ["A320", "B737", "International"],
-    availability: "available",
-    hoursWorked: 32,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos",
-  },
-  {
-    id: "2",
-    name: "Maria Gonzalez",
-    position: "First Officer",
-    qualifications: ["A320", "Night Operations"],
-    availability: "on-duty",
-    hoursWorked: 45,
-    nextAvailable: "Tomorrow, 08:00",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-  },
-  {
-    id: "3",
-    name: "Juan Perez",
-    position: "Flight Attendant",
-    qualifications: ["First Aid", "Emergency Procedures"],
-    availability: "available",
-    hoursWorked: 28,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Juan",
-  },
-  {
-    id: "4",
-    name: "Ana Silva",
-    position: "Purser",
-    qualifications: ["Customer Service", "Leadership"],
-    availability: "rest-period",
-    hoursWorked: 52,
-    nextAvailable: "Tomorrow, 14:00",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ana",
-  },
-  {
-    id: "5",
-    name: "Diego Morales",
-    position: "Captain",
-    qualifications: ["B737", "Mountain Operations"],
-    availability: "leave",
-    hoursWorked: 0,
-    nextAvailable: "Next week",
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Diego",
-  },
-  {
-    id: "6",
-    name: "Sofia Ramirez",
-    position: "Flight Attendant",
-    qualifications: ["First Aid", "Multiple Languages"],
-    availability: "available",
-    hoursWorked: 36,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia",
-  },
-];
-
-const defaultFlights: Flight[] = [
-  {
-    id: "1",
-    flightNumber: "LA1234",
-    origin: "Santiago (SCL)",
-    destination: "Lima (LIM)",
-    departureTime: "Today, 14:30",
-    arrivalTime: "Today, 16:45",
-    aircraft: "Airbus A320",
-    status: "scheduled",
-    crew: [defaultCrewMembers[1], defaultCrewMembers[2]],
-  },
-  {
-    id: "2",
-    flightNumber: "LA2468",
-    origin: "Buenos Aires (EZE)",
-    destination: "Santiago (SCL)",
-    departureTime: "Today, 16:15",
-    arrivalTime: "Today, 18:20",
-    aircraft: "Boeing 787",
-    status: "boarding",
-    crew: [],
-  },
-  {
-    id: "3",
-    flightNumber: "LA3579",
-    origin: "Sao Paulo (GRU)",
-    destination: "Bogota (BOG)",
-    departureTime: "Tomorrow, 08:45",
-    arrivalTime: "Tomorrow, 12:30",
-    aircraft: "Boeing 737",
-    status: "scheduled",
-    crew: [defaultCrewMembers[0]],
-  },
-  {
-    id: "4",
-    flightNumber: "LA4680",
-    origin: "Santiago (SCL)",
-    destination: "Miami (MIA)",
-    departureTime: "Tomorrow, 23:30",
-    arrivalTime: "Next day, 06:45",
-    aircraft: "Boeing 787",
-    status: "scheduled",
-    crew: [],
-  },
-  {
-    id: "5",
-    flightNumber: "LA5792",
-    origin: "Lima (LIM)",
-    destination: "Quito (UIO)",
-    departureTime: "Today, 18:20",
-    arrivalTime: "Today, 20:15",
-    aircraft: "Airbus A320",
-    status: "delayed",
-    crew: [defaultCrewMembers[3], defaultCrewMembers[5]],
-  },
-];
 
 export default CrewAllocation;

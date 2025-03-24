@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import ModernProfile from "../profile/ModernProfile";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -231,18 +232,16 @@ const Header = ({
       )}
 
       {/* Profile Dialog */}
-      {showProfileDialog && (
-        <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-          <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Meu Perfil</DialogTitle>
-            </DialogHeader>
-            <div className="py-4">
-              <iframe src="/profile" className="w-full h-[70vh] border-0" />
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+        <DialogContent className="sm:max-w-[1200px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Meu Perfil</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <ModernProfile />
+          </div>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 };

@@ -76,3 +76,20 @@ const AircraftDetails = ({
     manufactureYear: 2016,
     status: "available",
     location: "Santiago (SCL)",
+    flightHours: 0,
+    cycles: 0,
+    lastMaintenance: "",
+    nextMaintenance: "",
+    maintenanceHistory: [],
+    specifications: {
+      seatingCapacity: 0,
+      range: "",
+      engines: "",
+      maxTakeoffWeight: ""
+    }
+  }
+}: AircraftDetailsProps) => {
+  // ... rest of the component code ...
+};
+
+export default AircraftDetails;

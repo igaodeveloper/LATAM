@@ -22,73 +22,177 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+
+// Types for settings
+interface SettingsState {
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    maintenance: boolean;
+    safety: boolean;
+    financial: boolean;
+    marketing: boolean;
+    updates: boolean;
+    alerts: boolean;
+  };
+  preferences: {
+    language: string;
+    timezone: string;
+    dateFormat: string;
+    timeFormat: string;
+    theme: string;
+    fontSize: string;
+    contrast: string;
+    animations: boolean;
+  };
+  security: {
+    twoFactor: boolean;
+    sessionTimeout: number;
+    passwordExpiry: number;
+    loginAttempts: number;
+    biometric: boolean;
+    encryption: boolean;
+    auditLog: boolean;
+    backupFrequency: string;
+  };
+  integrations: {
+    maintenance: boolean;
+    inventory: boolean;
+    financial: boolean;
+    safety: boolean;
+    analytics: boolean;
+    reporting: boolean;
+    api: boolean;
+    webhooks: boolean;
+  };
+  advanced: {
+    debugMode: boolean;
+    performanceMode: boolean;
+    cacheSize: number;
+    logLevel: string;
+    autoUpdate: boolean;
+    telemetry: boolean;
+    experimental: boolean;
+  };
+}
 
 const Settings = () => {
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: true,
-    sms: false,
-    maintenance: true,
-    safety: true,
-    financial: false,
-    marketing: false,
-    updates: true,
-    alerts: true,
-  });
-
-  const [preferences, setPreferences] = useState({
-    language: "pt-BR",
-    timezone: "America/Sao_Paulo",
-    dateFormat: "dd/MM/yyyy",
-    timeFormat: "24h",
-    theme: "light",
-    fontSize: "medium",
-    contrast: "normal",
-    animations: true,
-    compactMode: false,
-  });
-
-  const [security, setSecurity] = useState({
-    twoFactor: true,
-    sessionTimeout: 30,
-    passwordExpiry: 90,
-    loginAttempts: 5,
-    biometric: false,
-    encryption: true,
-    auditLog: true,
-    backupFrequency: "daily",
-  });
-
-  const [integrations, setIntegrations] = useState({
-    maintenance: true,
-    inventory: true,
-    financial: false,
-    safety: true,
-    analytics: true,
-    reporting: true,
-    api: false,
-    webhooks: false,
-  });
-
-  const [advanced, setAdvanced] = useState({
-    debugMode: false,
-    performanceMode: false,
-    cacheSize: 100,
-    logLevel: "info",
-    autoUpdate: true,
-    telemetry: false,
-    experimental: false,
+  // State management
+  const [settings, setSettings] = useState<SettingsState>({
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+      maintenance: true,
+      safety: true,
+      financial: false,
+      marketing: false,
+      updates: true,
+      alerts: true,
+    },
+    preferences: {
+      language: "pt-BR",
+      timezone: "America/Sao_Paulo",
+      dateFormat: "dd/MM/yyyy",
+      timeFormat: "24h",
+      theme: "light",
+      fontSize: "medium",
+      contrast: "normal",
+      animations: true,
+    },
+    security: {
+      twoFactor: true,
+      sessionTimeout: 30,
+      passwordExpiry: 90,
+      loginAttempts: 5,
+      biometric: false,
+      encryption: true,
+      auditLog: true,
+      backupFrequency: "daily",
+    },
+    integrations: {
+      maintenance: true,
+      inventory: true,
+      financial: false,
+      safety: true,
+      analytics: true,
+      reporting: true,
+      api: false,
+      webhooks: false,
+    },
+    advanced: {
+      debugMode: false,
+      performanceMode: false,
+      cacheSize: 100,
+      logLevel: "info",
+      autoUpdate: true,
+      telemetry: false,
+      experimental: false,
+    },
   });
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("notifications");
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
+  // Load settings from localStorage on component mount
+  useEffect(() => {
+    const loadSettings = () => {
+      try {
+        const savedSettings = localStorage.getItem("appSettings");
+        if (savedSettings) {
+          setSettings(JSON.parse(savedSettings));
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
+        toast.error("Erro ao carregar configurações");
+      }
+    };
+    loadSettings();
+  }, []);
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem("appSettings", JSON.stringify(settings));
+      setHasChanges(true);
+    } catch (error) {
+      console.error("Error saving settings:", error);
+    }
+  }, [settings]);
+
+  // Handle settings updates
+  const updateSettings = (section: keyof SettingsState, field: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }));
+  };
+
+  // Handle save
   const handleSave = async () => {
     setSaving(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
+      localStorage.setItem("appSettings", JSON.stringify(settings));
+      setHasChanges(false);
       toast.success("Configurações salvas com sucesso!");
     } catch (error) {
       toast.error("Erro ao salvar configurações");
@@ -97,24 +201,103 @@ const Settings = () => {
     }
   };
 
+  // Handle reset
   const handleReset = () => {
-    toast.warning("Tem certeza que deseja redefinir todas as configurações?");
-    // Implement reset logic
+    setShowResetDialog(true);
   };
 
+  const confirmReset = () => {
+    const defaultSettings: SettingsState = {
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+        maintenance: true,
+        safety: true,
+        financial: false,
+        marketing: false,
+        updates: true,
+        alerts: true,
+      },
+      preferences: {
+        language: "pt-BR",
+        timezone: "America/Sao_Paulo",
+        dateFormat: "dd/MM/yyyy",
+        timeFormat: "24h",
+        theme: "light",
+        fontSize: "medium",
+        contrast: "normal",
+        animations: true,
+      },
+      security: {
+        twoFactor: true,
+        sessionTimeout: 30,
+        passwordExpiry: 90,
+        loginAttempts: 5,
+        biometric: false,
+        encryption: true,
+        auditLog: true,
+        backupFrequency: "daily",
+      },
+      integrations: {
+        maintenance: true,
+        inventory: true,
+        financial: false,
+        safety: true,
+        analytics: true,
+        reporting: true,
+        api: false,
+        webhooks: false,
+      },
+      advanced: {
+        debugMode: false,
+        performanceMode: false,
+        cacheSize: 100,
+        logLevel: "info",
+        autoUpdate: true,
+        telemetry: false,
+        experimental: false,
+      },
+    };
+
+    setSettings(defaultSettings);
+    localStorage.setItem("appSettings", JSON.stringify(defaultSettings));
+    setHasChanges(false);
+    setShowResetDialog(false);
+    toast.success("Configurações redefinidas com sucesso!");
+  };
+
+  // Apply theme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-theme", settings.preferences.theme);
+  }, [settings.preferences.theme]);
+
+  // Apply font size changes
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-font-size", settings.preferences.fontSize);
+  }, [settings.preferences.fontSize]);
+
+  // Apply contrast changes
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-contrast", settings.preferences.contrast);
+  }, [settings.preferences.contrast]);
+
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
+    <div className="w-full h-full bg-background">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
-          <p className="text-gray-500">Gerencie suas preferências e configurações do sistema</p>
+          <h1 className="text-2xl font-bold text-primary">Configurações</h1>
+          <p className="text-muted-foreground">Gerencie suas preferências e configurações do sistema</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleReset}>
             <Trash2 className="h-4 w-4 mr-2" />
             Redefinir
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving || !hasChanges}>
             {saving ? (
               <>
                 <span className="animate-spin mr-2">⏳</span>
@@ -154,7 +337,7 @@ const Settings = () => {
           </TabsTrigger>
         </TabsList>
 
-        <ScrollArea className="h-[calc(100vh-200px)]">
+        <ScrollArea className="h-[calc(100vh-300px)]">
           <TabsContent value="notifications" className="space-y-6">
             <Card>
               <CardHeader>
@@ -171,9 +354,9 @@ const Settings = () => {
                       <Label>Notificações por Email</Label>
                     </div>
                     <Switch
-                      checked={notifications.email}
+                      checked={settings.notifications.email}
                       onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, email: checked })
+                        updateSettings("notifications", "email", checked)
                       }
                     />
                   </div>
@@ -183,9 +366,9 @@ const Settings = () => {
                       <Label>Notificações Push</Label>
                     </div>
                     <Switch
-                      checked={notifications.push}
+                      checked={settings.notifications.push}
                       onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, push: checked })
+                        updateSettings("notifications", "push", checked)
                       }
                     />
                   </div>
@@ -195,9 +378,9 @@ const Settings = () => {
                       <Label>Notificações por SMS</Label>
                     </div>
                     <Switch
-                      checked={notifications.sms}
+                      checked={settings.notifications.sms}
                       onCheckedChange={(checked) =>
-                        setNotifications({ ...notifications, sms: checked })
+                        updateSettings("notifications", "sms", checked)
                       }
                     />
                   </div>
@@ -214,9 +397,9 @@ const Settings = () => {
                         <Label>Manutenção</Label>
                       </div>
                       <Switch
-                        checked={notifications.maintenance}
+                        checked={settings.notifications.maintenance}
                         onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, maintenance: checked })
+                          updateSettings("notifications", "maintenance", checked)
                         }
                       />
                     </div>
@@ -226,9 +409,9 @@ const Settings = () => {
                         <Label>Segurança</Label>
                       </div>
                       <Switch
-                        checked={notifications.safety}
+                        checked={settings.notifications.safety}
                         onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, safety: checked })
+                          updateSettings("notifications", "safety", checked)
                         }
                       />
                     </div>
@@ -238,9 +421,9 @@ const Settings = () => {
                         <Label>Financeiro</Label>
                       </div>
                       <Switch
-                        checked={notifications.financial}
+                        checked={settings.notifications.financial}
                         onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, financial: checked })
+                          updateSettings("notifications", "financial", checked)
                         }
                       />
                     </div>
@@ -250,9 +433,9 @@ const Settings = () => {
                         <Label>Atualizações</Label>
                       </div>
                       <Switch
-                        checked={notifications.updates}
+                        checked={settings.notifications.updates}
                         onCheckedChange={(checked) =>
-                          setNotifications({ ...notifications, updates: checked })
+                          updateSettings("notifications", "updates", checked)
                         }
                       />
                     </div>
@@ -276,9 +459,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Idioma</Label>
                       <Select
-                        value={preferences.language}
+                        value={settings.preferences.language}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, language: value })
+                          updateSettings("preferences", "language", value)
                         }
                       >
                         <SelectTrigger>
@@ -295,9 +478,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Fuso Horário</Label>
                       <Select
-                        value={preferences.timezone}
+                        value={settings.preferences.timezone}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, timezone: value })
+                          updateSettings("preferences", "timezone", value)
                         }
                       >
                         <SelectTrigger>
@@ -314,9 +497,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Formato de Data</Label>
                       <Select
-                        value={preferences.dateFormat}
+                        value={settings.preferences.dateFormat}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, dateFormat: value })
+                          updateSettings("preferences", "dateFormat", value)
                         }
                       >
                         <SelectTrigger>
@@ -335,9 +518,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Formato de Hora</Label>
                       <Select
-                        value={preferences.timeFormat}
+                        value={settings.preferences.timeFormat}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, timeFormat: value })
+                          updateSettings("preferences", "timeFormat", value)
                         }
                       >
                         <SelectTrigger>
@@ -353,9 +536,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Tema</Label>
                       <Select
-                        value={preferences.theme}
+                        value={settings.preferences.theme}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, theme: value })
+                          updateSettings("preferences", "theme", value)
                         }
                       >
                         <SelectTrigger>
@@ -372,9 +555,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Tamanho da Fonte</Label>
                       <Select
-                        value={preferences.fontSize}
+                        value={settings.preferences.fontSize}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, fontSize: value })
+                          updateSettings("preferences", "fontSize", value)
                         }
                       >
                         <SelectTrigger>
@@ -398,9 +581,9 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label>Contraste</Label>
                       <Select
-                        value={preferences.contrast}
+                        value={settings.preferences.contrast}
                         onValueChange={(value) =>
-                          setPreferences({ ...preferences, contrast: value })
+                          updateSettings("preferences", "contrast", value)
                         }
                       >
                         <SelectTrigger>
@@ -412,18 +595,6 @@ const Settings = () => {
                           <SelectItem value="inverted">Invertido</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg border">
-                      <div className="flex items-center space-x-2">
-                        <Palette className="h-4 w-4" />
-                        <Label>Modo Compacto</Label>
-                      </div>
-                      <Switch
-                        checked={preferences.compactMode}
-                        onCheckedChange={(checked) =>
-                          setPreferences({ ...preferences, compactMode: checked })
-                        }
-                      />
                     </div>
                   </div>
                 </div>
@@ -447,9 +618,9 @@ const Settings = () => {
                       <Label>Autenticação em Dois Fatores</Label>
                     </div>
                     <Switch
-                      checked={security.twoFactor}
+                      checked={settings.security.twoFactor}
                       onCheckedChange={(checked) =>
-                        setSecurity({ ...security, twoFactor: checked })
+                        updateSettings("security", "twoFactor", checked)
                       }
                     />
                   </div>
@@ -458,9 +629,9 @@ const Settings = () => {
                     <Label>Timeout da Sessão (minutos)</Label>
                     <Input
                       type="number"
-                      value={security.sessionTimeout}
+                      value={settings.security.sessionTimeout}
                       onChange={(e) =>
-                        setSecurity({ ...security, sessionTimeout: parseInt(e.target.value) })
+                        updateSettings("security", "sessionTimeout", parseInt(e.target.value))
                       }
                       min={1}
                       max={120}
@@ -471,9 +642,9 @@ const Settings = () => {
                     <Label>Expiração da Senha (dias)</Label>
                     <Input
                       type="number"
-                      value={security.passwordExpiry}
+                      value={settings.security.passwordExpiry}
                       onChange={(e) =>
-                        setSecurity({ ...security, passwordExpiry: parseInt(e.target.value) })
+                        updateSettings("security", "passwordExpiry", parseInt(e.target.value))
                       }
                       min={1}
                       max={365}
@@ -484,9 +655,9 @@ const Settings = () => {
                     <Label>Tentativas de Login</Label>
                     <Input
                       type="number"
-                      value={security.loginAttempts}
+                      value={settings.security.loginAttempts}
                       onChange={(e) =>
-                        setSecurity({ ...security, loginAttempts: parseInt(e.target.value) })
+                        updateSettings("security", "loginAttempts", parseInt(e.target.value))
                       }
                       min={1}
                       max={10}
@@ -505,9 +676,9 @@ const Settings = () => {
                         <Label>Autenticação Biométrica</Label>
                       </div>
                       <Switch
-                        checked={security.biometric}
+                        checked={settings.security.biometric}
                         onCheckedChange={(checked) =>
-                          setSecurity({ ...security, biometric: checked })
+                          updateSettings("security", "biometric", checked)
                         }
                       />
                     </div>
@@ -517,9 +688,9 @@ const Settings = () => {
                         <Label>Criptografia de Dados</Label>
                       </div>
                       <Switch
-                        checked={security.encryption}
+                        checked={settings.security.encryption}
                         onCheckedChange={(checked) =>
-                          setSecurity({ ...security, encryption: checked })
+                          updateSettings("security", "encryption", checked)
                         }
                       />
                     </div>
@@ -529,18 +700,18 @@ const Settings = () => {
                         <Label>Log de Auditoria</Label>
                       </div>
                       <Switch
-                        checked={security.auditLog}
+                        checked={settings.security.auditLog}
                         onCheckedChange={(checked) =>
-                          setSecurity({ ...security, auditLog: checked })
+                          updateSettings("security", "auditLog", checked)
                         }
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Frequência de Backup</Label>
                       <Select
-                        value={security.backupFrequency}
+                        value={settings.security.backupFrequency}
                         onValueChange={(value) =>
-                          setSecurity({ ...security, backupFrequency: value })
+                          updateSettings("security", "backupFrequency", value)
                         }
                       >
                         <SelectTrigger>
@@ -575,9 +746,9 @@ const Settings = () => {
                       <Label>Manutenção</Label>
                     </div>
                     <Switch
-                      checked={integrations.maintenance}
+                      checked={settings.integrations.maintenance}
                       onCheckedChange={(checked) =>
-                        setIntegrations({ ...integrations, maintenance: checked })
+                        updateSettings("integrations", "maintenance", checked)
                       }
                     />
                   </div>
@@ -587,9 +758,9 @@ const Settings = () => {
                       <Label>Inventário</Label>
                     </div>
                     <Switch
-                      checked={integrations.inventory}
+                      checked={settings.integrations.inventory}
                       onCheckedChange={(checked) =>
-                        setIntegrations({ ...integrations, inventory: checked })
+                        updateSettings("integrations", "inventory", checked)
                       }
                     />
                   </div>
@@ -599,9 +770,9 @@ const Settings = () => {
                       <Label>Financeiro</Label>
                     </div>
                     <Switch
-                      checked={integrations.financial}
+                      checked={settings.integrations.financial}
                       onCheckedChange={(checked) =>
-                        setIntegrations({ ...integrations, financial: checked })
+                        updateSettings("integrations", "financial", checked)
                       }
                     />
                   </div>
@@ -611,9 +782,9 @@ const Settings = () => {
                       <Label>Segurança</Label>
                     </div>
                     <Switch
-                      checked={integrations.safety}
+                      checked={settings.integrations.safety}
                       onCheckedChange={(checked) =>
-                        setIntegrations({ ...integrations, safety: checked })
+                        updateSettings("integrations", "safety", checked)
                       }
                     />
                   </div>
@@ -630,9 +801,9 @@ const Settings = () => {
                         <Label>API REST</Label>
                       </div>
                       <Switch
-                        checked={integrations.api}
+                        checked={settings.integrations.api}
                         onCheckedChange={(checked) =>
-                          setIntegrations({ ...integrations, api: checked })
+                          updateSettings("integrations", "api", checked)
                         }
                       />
                     </div>
@@ -642,9 +813,9 @@ const Settings = () => {
                         <Label>Webhooks</Label>
                       </div>
                       <Switch
-                        checked={integrations.webhooks}
+                        checked={settings.integrations.webhooks}
                         onCheckedChange={(checked) =>
-                          setIntegrations({ ...integrations, webhooks: checked })
+                          updateSettings("integrations", "webhooks", checked)
                         }
                       />
                     </div>
@@ -679,9 +850,9 @@ const Settings = () => {
                       <Label>Modo Debug</Label>
                     </div>
                     <Switch
-                      checked={advanced.debugMode}
+                      checked={settings.advanced.debugMode}
                       onCheckedChange={(checked) =>
-                        setAdvanced({ ...advanced, debugMode: checked })
+                        updateSettings("advanced", "debugMode", checked)
                       }
                     />
                   </div>
@@ -692,9 +863,9 @@ const Settings = () => {
                       <Label>Modo de Alto Desempenho</Label>
                     </div>
                     <Switch
-                      checked={advanced.performanceMode}
+                      checked={settings.advanced.performanceMode}
                       onCheckedChange={(checked) =>
-                        setAdvanced({ ...advanced, performanceMode: checked })
+                        updateSettings("advanced", "performanceMode", checked)
                       }
                     />
                   </div>
@@ -703,9 +874,9 @@ const Settings = () => {
                     <Label>Tamanho do Cache (MB)</Label>
                     <Input
                       type="number"
-                      value={advanced.cacheSize}
+                      value={settings.advanced.cacheSize}
                       onChange={(e) =>
-                        setAdvanced({ ...advanced, cacheSize: parseInt(e.target.value) })
+                        updateSettings("advanced", "cacheSize", parseInt(e.target.value))
                       }
                       min={50}
                       max={1000}
@@ -715,9 +886,9 @@ const Settings = () => {
                   <div className="space-y-2">
                     <Label>Nível de Log</Label>
                     <Select
-                      value={advanced.logLevel}
+                      value={settings.advanced.logLevel}
                       onValueChange={(value) =>
-                        setAdvanced({ ...advanced, logLevel: value })
+                        updateSettings("advanced", "logLevel", value)
                       }
                     >
                       <SelectTrigger>
@@ -738,9 +909,9 @@ const Settings = () => {
                       <Label>Atualização Automática</Label>
                     </div>
                     <Switch
-                      checked={advanced.autoUpdate}
+                      checked={settings.advanced.autoUpdate}
                       onCheckedChange={(checked) =>
-                        setAdvanced({ ...advanced, autoUpdate: checked })
+                        updateSettings("advanced", "autoUpdate", checked)
                       }
                     />
                   </div>
@@ -751,9 +922,9 @@ const Settings = () => {
                       <Label>Telemetria</Label>
                     </div>
                     <Switch
-                      checked={advanced.telemetry}
+                      checked={settings.advanced.telemetry}
                       onCheckedChange={(checked) =>
-                        setAdvanced({ ...advanced, telemetry: checked })
+                        updateSettings("advanced", "telemetry", checked)
                       }
                     />
                   </div>
@@ -764,9 +935,9 @@ const Settings = () => {
                       <Label>Recursos Experimentais</Label>
                     </div>
                     <Switch
-                      checked={advanced.experimental}
+                      checked={settings.advanced.experimental}
                       onCheckedChange={(checked) =>
-                        setAdvanced({ ...advanced, experimental: checked })
+                        updateSettings("advanced", "experimental", checked)
                       }
                     />
                   </div>
@@ -776,6 +947,22 @@ const Settings = () => {
           </TabsContent>
         </ScrollArea>
       </Tabs>
+
+      <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Redefinição</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja redefinir todas as configurações para os valores padrão?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmReset}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -109,4 +109,24 @@ const Configuration = () => {
                   <div className="space-y-2">
                     <Label>Logs do Sistema</Label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex items-center space-x
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="error-logs" />
+                        <Label htmlFor="error-logs">Logs de Erro</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="access-logs" />
+                        <Label htmlFor="access-logs">Logs de Acesso</Label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Configuration;

@@ -538,6 +538,281 @@ export interface Database {
           },
         ];
       };
+      employees: {
+        Row: {
+          id: string;
+          name: string;
+          registration: string;
+          department: string;
+          position: string;
+          salary: number;
+          admission_date: string;
+          status: 'ativo' | 'afastado' | 'desligado';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          registration: string;
+          department: string;
+          position: string;
+          salary: number;
+          admission_date: string;
+          status: 'ativo' | 'afastado' | 'desligado';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          registration?: string;
+          department?: string;
+          position?: string;
+          salary?: number;
+          admission_date?: string;
+          status?: 'ativo' | 'afastado' | 'desligado';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employees_id_fkey";
+            columns: ["id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ]
+      };
+      terminations: {
+        Row: {
+          id: string;
+          employee_id: string;
+          termination_date: string;
+          reason: string;
+          status: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          salary_balance: number;
+          vacation_balance: number;
+          thirteenth_salary: number;
+          notice_period: number;
+          fgts_fine: number;
+          other_benefits: number;
+          deductions: number;
+          total_amount: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          employee_id: string;
+          termination_date: string;
+          reason: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          salary_balance: number;
+          vacation_balance: number;
+          thirteenth_salary: number;
+          notice_period: number;
+          fgts_fine: number;
+          other_benefits: number;
+          deductions: number;
+          total_amount: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          employee_id?: string;
+          termination_date?: string;
+          reason?: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          salary_balance?: number;
+          vacation_balance?: number;
+          thirteenth_salary?: number;
+          notice_period?: number;
+          fgts_fine?: number;
+          other_benefits?: number;
+          deductions?: number;
+          total_amount?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "terminations_employee_id_fkey";
+            columns: ["employee_id"];
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          }
+        ]
+      };
+      leaves: {
+        Row: {
+          id: string;
+          employee_id: string;
+          type: 'acidente_trabalho' | 'doenca' | 'maternidade' | 'paternidade' | 'ferias' | 'outros';
+          start_date: string;
+          end_date: string;
+          status: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          daily_amount: number;
+          total_amount: number;
+          medical_certificate: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          employee_id: string;
+          type: 'acidente_trabalho' | 'doenca' | 'maternidade' | 'paternidade' | 'ferias' | 'outros';
+          start_date: string;
+          end_date: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          daily_amount: number;
+          total_amount: number;
+          medical_certificate?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          employee_id?: string;
+          type?: 'acidente_trabalho' | 'doenca' | 'maternidade' | 'paternidade' | 'ferias' | 'outros';
+          start_date?: string;
+          end_date?: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          daily_amount?: number;
+          total_amount?: number;
+          medical_certificate?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "leaves_employee_id_fkey";
+            columns: ["employee_id"];
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          }
+        ]
+      };
+      documents: {
+        Row: {
+          id: string;
+          process_id: string;
+          process_type: 'termination' | 'leave';
+          name: string;
+          type: string;
+          url: string;
+          uploaded_at: string;
+          status: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+        };
+        Insert: {
+          id?: string;
+          process_id: string;
+          process_type: 'termination' | 'leave';
+          name: string;
+          type: string;
+          url: string;
+          uploaded_at?: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+        };
+        Update: {
+          id?: string;
+          process_id?: string;
+          process_type?: 'termination' | 'leave';
+          name?: string;
+          type?: string;
+          url?: string;
+          uploaded_at?: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+        };
+        Relationships: []
+      };
+      notifications: {
+        Row: {
+          id: string;
+          employee_id: string;
+          title: string;
+          message: string;
+          type: 'info' | 'success' | 'warning' | 'error';
+          read: boolean;
+          created_at: string;
+          process_id: string | null;
+          process_type: 'termination' | 'leave' | null;
+        };
+        Insert: {
+          id?: string;
+          employee_id: string;
+          title: string;
+          message: string;
+          type: 'info' | 'success' | 'warning' | 'error';
+          read?: boolean;
+          created_at?: string;
+          process_id?: string | null;
+          process_type?: 'termination' | 'leave' | null;
+        };
+        Update: {
+          id?: string;
+          employee_id?: string;
+          title?: string;
+          message?: string;
+          type?: 'info' | 'success' | 'warning' | 'error';
+          read?: boolean;
+          created_at?: string;
+          process_id?: string | null;
+          process_type?: 'termination' | 'leave' | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notifications_employee_id_fkey";
+            columns: ["employee_id"];
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          }
+        ]
+      };
+      process_history: {
+        Row: {
+          id: string;
+          employee_id: string;
+          process_type: 'termination' | 'leave';
+          process_id: string;
+          action: string;
+          status: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          details: string;
+          created_at: string;
+          created_by: string;
+        };
+        Insert: {
+          id?: string;
+          employee_id: string;
+          process_type: 'termination' | 'leave';
+          process_id: string;
+          action: string;
+          status: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          details: string;
+          created_at?: string;
+          created_by: string;
+        };
+        Update: {
+          id?: string;
+          employee_id?: string;
+          process_type?: 'termination' | 'leave';
+          process_id?: string;
+          action?: string;
+          status?: 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
+          details?: string;
+          created_at?: string;
+          created_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "process_history_employee_id_fkey";
+            columns: ["employee_id"];
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          }
+        ]
+      }
     };
     Views: {
       [_ in never]: never;

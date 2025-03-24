@@ -16,6 +16,10 @@ import {
   CheckSquare,
   Luggage,
   BarChart3,
+  FileText,
+  Calculator,
+  Bell,
+  History,
 } from "lucide-react";
 import {
   Tooltip,
@@ -98,6 +102,20 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
       path: "/rastreamento-bagagem",
       icon: <Luggage size={20} />,
     },
+    {
+      name: "Processos RH",
+      path: "/hr/dashboard",
+      icon: <FileText size={20} />,
+      subItems: [
+        { name: "Dashboard RH", path: "/hr/dashboard", icon: <LayoutDashboard size={20} /> },
+        { name: "Rescisão", path: "/hr/rescisao", icon: <Calculator size={20} /> },
+        { name: "Afastamento", path: "/hr/afastamento", icon: <FileText size={20} /> },
+        { name: "Histórico", path: "/hr/processos", icon: <History size={20} /> },
+        { name: "Notificações", path: "/hr/notificacoes", icon: <Bell size={20} /> },
+        { name: "Simulador", path: "/hr/simulador", icon: <Calculator size={20} /> },
+        { name: "Documentos", path: "/hr/documentos", icon: <FileText size={20} /> },
+      ],
+    },
   ];
 
   const bottomNavItems = [
@@ -119,14 +137,14 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
     <aside
       className={cn(
         "h-full bg-slate-900 text-white flex flex-col justify-between transition-all duration-300 animate-slide-in-left",
-        isCollapsed ? "w-16" : "w-64",
+        isCollapsed ? "w-16" : "w-64"
       )}
     >
       <div>
         {/* Logo */}
         <div className="flex items-center justify-center h-16 border-b border-slate-700">
           {!isCollapsed ? (
-            <div className="flex items-center">
+            <div className="flex items-center animate-scale-in">
               <AnimatedLogo size="sm" color="white" className="mr-2" />
               <div className="text-xl font-bold text-blue-500">
                 LATAM Airlines
@@ -140,7 +158,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
         {/* Navigation */}
         <nav className="mt-6 px-2">
           <ul className="space-y-2">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <li key={item.path}>
                 <TooltipProvider delayDuration={300}>
                   <Tooltip>
@@ -148,23 +166,45 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                       <Link
                         to={item.path}
                         className={cn(
-                          "flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
+                          "flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105",
                           isActive(item.path)
                             ? "bg-slate-800 text-blue-400"
                             : "text-slate-300",
+                          "animate-fade-in"
                         )}
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <span className="mr-3">{item.icon}</span>
                         {!isCollapsed && <span>{item.name}</span>}
                       </Link>
                     </TooltipTrigger>
                     {isCollapsed && (
-                      <TooltipContent side="right">
+                      <TooltipContent side="right" className="animate-scale-in">
                         <p>{item.name}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>
                 </TooltipProvider>
+                {item.subItems && !isCollapsed && (
+                  <ul className="ml-6 mt-2 space-y-1">
+                    {item.subItems.map((subItem) => (
+                      <li key={subItem.path}>
+                        <Link
+                          to={subItem.path}
+                          className={cn(
+                            "flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105",
+                            isActive(subItem.path)
+                              ? "bg-slate-800 text-blue-400"
+                              : "text-slate-300",
+                          )}
+                        >
+                          <span className="mr-3">{subItem.icon}</span>
+                          <span>{subItem.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
@@ -176,7 +216,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
         {/* Collapse button */}
         <button
           onClick={toggleSidebar}
-          className="w-full flex items-center justify-center p-2 mb-4 rounded-md hover:bg-slate-800 transition-colors text-slate-300"
+          className="w-full flex items-center justify-center p-2 mb-4 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105 text-slate-300"
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           {!isCollapsed && <span className="ml-2">Collapse</span>}
@@ -193,7 +233,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                       <button
                         onClick={item.onClick}
                         className={cn(
-                          "w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
+                          "w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105",
                           isActive(item.path)
                             ? "bg-slate-800 text-blue-400"
                             : "text-slate-300",
@@ -206,7 +246,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                       <Link
                         to={item.path}
                         className={cn(
-                          "flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors",
+                          "flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105",
                           isActive(item.path)
                             ? "bg-slate-800 text-blue-400"
                             : "text-slate-300",
@@ -218,7 +258,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                     )}
                   </TooltipTrigger>
                   {isCollapsed && (
-                    <TooltipContent side="right">
+                    <TooltipContent side="right" className="animate-scale-in">
                       <p>{item.name}</p>
                     </TooltipContent>
                   )}
@@ -232,7 +272,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setShowLogoutDialog(true)}
-                    className="w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-colors text-slate-300"
+                    className="w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200 transform hover:scale-105 text-slate-300"
                   >
                     <span className="mr-3">
                       <LogOut size={20} />
@@ -241,7 +281,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
                   </button>
                 </TooltipTrigger>
                 {isCollapsed && (
-                  <TooltipContent side="right">
+                  <TooltipContent side="right" className="animate-scale-in">
                     <p>Sair</p>
                   </TooltipContent>
                 )}
@@ -253,7 +293,7 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
 
       {/* Logout Dialog */}
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent>
+        <DialogContent className="animate-scale-in">
           <DialogHeader>
             <DialogTitle>Confirmar Saída</DialogTitle>
             <DialogDescription>
@@ -264,22 +304,48 @@ const Sidebar = ({ collapsed = false, onToggle = () => {} }: SidebarProps) => {
             <Button
               variant="outline"
               onClick={() => setShowLogoutDialog(false)}
+              className="animate-fade-in"
             >
               Cancelar
             </Button>
-            <Button variant="destructive">Sair</Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                // Handle logout
+                setShowLogoutDialog(false);
+              }}
+              className="animate-fade-in"
+            >
+              Sair
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Help Dialog */}
       <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="animate-scale-in">
           <DialogHeader>
-            <DialogTitle>Ajuda e Suporte</DialogTitle>
+            <DialogTitle>Ajuda & Suporte</DialogTitle>
+            <DialogDescription>
+              Como podemos ajudar você hoje?
+            </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <iframe src="/help" className="w-full h-[70vh] border-0" />
+          <div className="space-y-4">
+            <Button
+              variant="outline"
+              className="w-full justify-start animate-fade-in"
+            >
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Central de Ajuda
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start animate-fade-in"
+            >
+              <User className="mr-2 h-4 w-4" />
+              Suporte ao Usuário
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

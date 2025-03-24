@@ -1648,4 +1648,6 @@ const translations: TranslationsType = {
     'app.pronounced': 'Pronunciado',
     'app.announced': 'Anunciado',
     'app.proclaimed': 'Proclamado',
-    'app
+    'app.published': 'Publicado'
+  }
+}

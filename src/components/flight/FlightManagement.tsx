@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -58,6 +59,7 @@ import {
   TableRow,
   TableCaption,
 } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
 
 interface Flight {
   id: string;
@@ -66,161 +68,50 @@ interface Flight {
   destination: string;
   departureTime: string;
   arrivalTime: string;
+  status: "scheduled" | "boarding" | "in-flight" | "landed" | "cancelled";
   aircraft: string;
-  status:
-    | "scheduled"
-    | "boarding"
-    | "in-flight"
-    | "arrived"
-    | "delayed"
-    | "cancelled";
   crew: string;
-  passengers: number;
 }
 
-interface FlightManagementProps {
-  flights?: Flight[];
-}
-
-const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
-  // Default flights data if none provided
-  const defaultFlights: Flight[] = [
+const FlightManagement = () => {
+  const [flights, setFlights] = useState<Flight[]>([
     {
       id: "1",
       flightNumber: "LA1234",
-      origin: "Santiago (SCL)",
-      destination: "Lima (LIM)",
-      departureTime: "2023-06-15T08:30:00",
-      arrivalTime: "2023-06-15T10:45:00",
-      aircraft: "Boeing 787-9",
-      status: "scheduled",
-      crew: "Assigned",
-      passengers: 150,
-    },
-    {
-      id: "2",
-      flightNumber: "LA2156",
-      origin: "Buenos Aires (EZE)",
-      destination: "São Paulo (GRU)",
-      departureTime: "2023-06-15T14:15:00",
-      arrivalTime: "2023-06-15T16:30:00",
-      aircraft: "Airbus A320",
-      status: "in-flight",
-      crew: "Assigned",
-      passengers: 120,
-    },
-    {
-      id: "3",
-      flightNumber: "LA7890",
-      origin: "Lima (LIM)",
-      destination: "Bogotá (BOG)",
-      departureTime: "2023-06-15T18:45:00",
-      arrivalTime: "2023-06-15T21:00:00",
-      aircraft: "Airbus A319",
-      status: "delayed",
-      crew: "Pending",
-      passengers: 160,
-    },
-    {
-      id: "4",
-      flightNumber: "LA5432",
-      origin: "Santiago (SCL)",
-      destination: "Miami (MIA)",
-      departureTime: "2023-06-16T01:20:00",
-      arrivalTime: "2023-06-16T09:45:00",
-      aircraft: "Boeing 787-9",
-      status: "scheduled",
-      crew: "Assigned",
-      passengers: 150,
-    },
-    {
-      id: "5",
-      flightNumber: "LA3210",
       origin: "São Paulo (GRU)",
-      destination: "Santiago (SCL)",
-      departureTime: "2023-06-16T11:30:00",
-      arrivalTime: "2023-06-16T14:15:00",
-      aircraft: "Airbus A320",
+      destination: "Rio de Janeiro (GIG)",
+      departureTime: "2024-03-25 08:00",
+      arrivalTime: "2024-03-25 09:30",
       status: "scheduled",
-      crew: "Assigned",
-      passengers: 120,
+      aircraft: "Boeing 737-800",
+      crew: "Crew A",
     },
-  ];
+    // Add more sample flights as needed
+  ]);
 
-  const [flights] = useState<Flight[]>(propFlights || defaultFlights);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [routeFilter, setRouteFilter] = useState("all");
-  const [isNewFlightDialogOpen, setIsNewFlightDialogOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("schedule");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
-  // Filter flights based on search term
-  const filteredFlights = flights.filter(
-    (flight) =>
-      flight.flightNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      flight.origin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      flight.destination.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredFlights = flights.filter((flight) => {
+    const matchesSearch =
+      flight.flightNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      flight.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      flight.destination.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || flight.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Get status badge color
-  const getStatusBadgeVariant = (status: Flight["status"]) => {
-    switch (status) {
-      case "scheduled":
-        return "secondary";
-      case "boarding":
-        return "default";
-      case "in-flight":
-        return "default";
-      case "arrived":
-        return "secondary";
-      case "delayed":
-        return "destructive";
-      case "cancelled":
-        return "destructive";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return "text-blue-600 bg-blue-50";
-      case "in-flight":
-        return "text-green-600 bg-green-50";
-      case "delayed":
-        return "text-yellow-600 bg-yellow-50";
-      case "cancelled":
-        return "text-red-600 bg-red-50";
-      default:
-        return "text-gray-600 bg-gray-50";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "scheduled":
-        return <Clock className="h-4 w-4" />;
-      case "in-flight":
-        return <CheckCircle className="h-4 w-4" />;
-      case "delayed":
-        return <AlertCircle className="h-4 w-4" />;
-      case "cancelled":
-        return <AlertCircle className="h-4 w-4" />;
-      default:
-        return null;
-    }
+  const getStatusColor = (status: Flight["status"]) => {
+    const colors = {
+      scheduled: "bg-blue-100 text-blue-800",
+      boarding: "bg-yellow-100 text-yellow-800",
+      "in-flight": "bg-green-100 text-green-800",
+      landed: "bg-gray-100 text-gray-800",
+      cancelled: "bg-red-100 text-red-800",
+    };
+    return colors[status];
   };
 
   return (
@@ -228,6 +119,104 @@ const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Voos</h1>
         <p className="text-gray-500">Gerencie voos, escalas e operações</p>
+      </div>
+
+      <div className="flex justify-between items-center mb-6">
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Voo
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Adicionar Novo Voo</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="flightNumber">Número do Voo</Label>
+                <Input id="flightNumber" placeholder="LA1234" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="origin">Origem</Label>
+                <Input id="origin" placeholder="São Paulo (GRU)" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="destination">Destino</Label>
+                <Input id="destination" placeholder="Rio de Janeiro (GIG)" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="departureTime">Horário de Partida</Label>
+                <Input id="departureTime" type="datetime-local" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="arrivalTime">Horário de Chegada</Label>
+                <Input id="arrivalTime" type="datetime-local" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="aircraft">Aeronave</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a aeronave" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="737-800">Boeing 737-800</SelectItem>
+                    <SelectItem value="320">Airbus A320</SelectItem>
+                    <SelectItem value="350">Airbus A350</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="crew">Tripulação</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a tripulação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="crew-a">Crew A</SelectItem>
+                    <SelectItem value="crew-b">Crew B</SelectItem>
+                    <SelectItem value="crew-c">Crew C</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={() => setShowAddDialog(false)}>Salvar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex gap-4 mb-6">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Buscar voos..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="scheduled">Agendado</SelectItem>
+            <SelectItem value="boarding">Embarque</SelectItem>
+            <SelectItem value="in-flight">Em Voo</SelectItem>
+            <SelectItem value="landed">Pousado</SelectItem>
+            <SelectItem value="cancelled">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -240,8 +229,8 @@ const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
                       placeholder="Pesquisar voos..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 w-[300px]"
                     />
                   </div>
@@ -253,26 +242,11 @@ const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
                       <SelectItem value="all">Todos</SelectItem>
                       <SelectItem value="scheduled">Agendados</SelectItem>
                       <SelectItem value="in-flight">Em Andamento</SelectItem>
-                      <SelectItem value="delayed">Atrasados</SelectItem>
+                      <SelectItem value="landed">Pousados</SelectItem>
                       <SelectItem value="cancelled">Cancelados</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Select value={routeFilter} onValueChange={setRouteFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="Rota" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas</SelectItem>
-                      <SelectItem value="scl-lim">SCL - LIM</SelectItem>
-                      <SelectItem value="eze-gru">EZE - GRU</SelectItem>
-                      <SelectItem value="gru-scl">GRU - SCL</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Novo Voo
-                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -287,7 +261,6 @@ const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
                     <TableHead>Aeronave</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Tripulação</TableHead>
-                    <TableHead>Passageiros</TableHead>
                     <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -310,24 +283,19 @@ const FlightManagement = ({ flights: propFlights }: FlightManagementProps) => {
                             flight.status
                           )}`}
                         >
-                          {getStatusIcon(flight.status)}
-                          <span className="ml-1">
-                            {flight.status === "scheduled"
-                              ? "Agendado"
-                              : flight.status === "in-flight"
-                              ? "Em Andamento"
-                              : flight.status === "delayed"
-                              ? "Atrasado"
-                              : "Cancelado"}
-                          </span>
+                          {flight.status}
                         </div>
                       </TableCell>
                       <TableCell>{flight.crew}</TableCell>
-                      <TableCell>{flight.passengers}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
-                          Detalhes
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="icon">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

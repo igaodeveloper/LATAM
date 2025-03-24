@@ -1,3 +1,122 @@
+# Portfolio LATAM
+
+## 📋 Sobre o Projeto
+Este é um projeto de portfólio profissional desenvolvido com React, TypeScript e Vite. O projeto utiliza uma stack moderna de tecnologias e oferece uma experiência de usuário fluida e responsiva.
+
+## 🚀 Tecnologias Utilizadas
+- React 18
+- TypeScript
+- Vite
+- TailwindCSS
+- Radix UI
+- Supabase
+- React Router
+- Framer Motion
+- React Hook Form
+- Zod
+- Recharts
+- E muito mais...
+
+## 🛠️ Pré-requisitos
+- Node.js (versão 16 ou superior)
+- npm ou yarn
+
+## 🔧 Instalação e Execução
+
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITÓRIO]
+cd portfolioigao-main/LATAM
+```
+
+2. Instale as dependências:
+```bash
+npm install
+# ou
+yarn install
+```
+
+3. Configure as variáveis de ambiente:
+- Copie o arquivo `.env.example` para `.env`
+- Preencha as variáveis necessárias no arquivo `.env`
+
+4. Execute o projeto em modo de desenvolvimento:
+```bash
+npm run dev
+# ou
+yarn dev
+```
+
+5. Para build de produção:
+```bash
+npm run build
+# ou
+yarn build
+```
+
+6. Para visualizar o build de produção:
+```bash
+npm run preview
+# ou
+yarn preview
+```
+
+## 📁 Estrutura do Projeto
+```
+src/
+├── api/          # Configurações e chamadas de API
+├── components/   # Componentes reutilizáveis
+├── contexts/     # Contextos React
+├── hooks/        # Custom hooks
+├── lib/          # Utilitários e configurações
+├── routes/       # Configuração de rotas
+├── services/     # Serviços e integrações
+├── styles/       # Estilos globais
+├── types/        # Definições de tipos TypeScript
+└── stories/      # Componentes de documentação
+```
+
+## 🎨 Features
+- Design responsivo
+- Animações suaves com Framer Motion
+- Componentes acessíveis com Radix UI
+- Formulários validados com Zod
+- Estilização com TailwindCSS
+- Navegação com React Router
+- Integração com Supabase
+- Visualização de dados com Recharts
+
+## 📝 Scripts Disponíveis
+- `npm run dev`: Inicia o servidor de desenvolvimento
+- `npm run build`: Cria o build de produção
+- `npm run preview`: Visualiza o build de produção
+- `npm run lint`: Executa o linter
+- `npm run types:supabase`: Gera tipos do Supabase
+
+## 🔒 Variáveis de Ambiente
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+```
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+```
+
+## 🤝 Contribuindo
+1. Faça um Fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👥 Autores
+- Igor Oliveira - Desenvolvedor Principal
+
+## 🙏 Agradecimentos
+- Todos os contribuidores que ajudaram no desenvolvimento deste projeto
+- Comunidade React e todas as bibliotecas utilizadas
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

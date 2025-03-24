@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
   LogOut,
   Search,
   Menu,
+  X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,9 @@ const Topbar = ({
   userName = "John Doe",
   userAvatar = "",
 }: TopbarProps) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm animate-slide-in-down">
       <div className="flex items-center justify-between h-16 px-4">
@@ -51,7 +55,7 @@ const Topbar = ({
             variant="ghost"
             size="icon"
             onClick={onToggleSidebar}
-            className="mr-4"
+            className="mr-4 lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -79,62 +83,62 @@ const Topbar = ({
         {/* Center section - Navigation */}
         <div className="hidden lg:flex items-center space-x-1">
           <Link to="/">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
+            <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
               Dashboard
             </Button>
           </Link>
           <Link to="/gerenciamento-de-voos">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
+            <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
               <Plane className="h-4 w-4 mr-1" />
               Voos
             </Button>
           </Link>
           <Link to="/alocacao-tripulacao">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
+            <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
               <Users className="h-4 w-4 mr-1" />
               Tripulação
             </Button>
           </Link>
           <Link to="/monitoramento-aeronaves">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
+            <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
               <Wrench className="h-4 w-4 mr-1" />
               Aeronaves
             </Button>
           </Link>
           <Link to="/relatorios-desempenho">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
+            <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
               <BarChart3 className="h-4 w-4 mr-1" />
               Relatórios
             </Button>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-sm font-medium">
+              <Button variant="ghost" size="sm" className="text-sm font-medium hover:scale-105 transition-transform">
                 <UserCircle className="h-4 w-4 mr-1" />
                 Passageiros
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 animate-fade-in">
+            <DropdownMenuContent align="end" className="w-48 animate-scale-in">
               <Link to="/gestao-passageiros">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:scale-105 transition-transform">
                   <User className="h-4 w-4 mr-2" />
                   Gestão de Passageiros
                 </DropdownMenuItem>
               </Link>
               <Link to="/portal-cliente">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:scale-105 transition-transform">
                   <UserCircle className="h-4 w-4 mr-2" />
                   Portal do Cliente
                 </DropdownMenuItem>
               </Link>
               <Link to="/checkin-online">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:scale-105 transition-transform">
                   <CheckSquare className="h-4 w-4 mr-2" />
                   Check-in Online
                 </DropdownMenuItem>
               </Link>
               <Link to="/rastreamento-bagagem">
-                <DropdownMenuItem>
+                <DropdownMenuItem className="hover:scale-105 transition-transform">
                   <Luggage className="h-4 w-4 mr-2" />
                   Rastreamento de Bagagem
                 </DropdownMenuItem>
@@ -145,15 +149,33 @@ const Topbar = ({
 
         {/* Right section - Search, notifications, profile */}
         <div className="flex items-center space-x-2">
+          {/* Search */}
           <div className="relative hidden md:block">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Buscar..."
-              className="w-[200px] pl-8 h-9 rounded-full bg-gray-50"
-            />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="lg:hidden"
+            >
+              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </Button>
+            <div
+              className={`
+                absolute right-0 top-0 w-64 bg-white border rounded-lg shadow-lg transition-all duration-300
+                ${isSearchOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}
+              `}
+            >
+              <div className="p-2">
+                <Input
+                  type="search"
+                  placeholder="Buscar..."
+                  className="w-full pl-8 h-9 rounded-full bg-gray-50"
+                />
+              </div>
+            </div>
           </div>
 
+          {/* Notifications */}
           <Button
             variant="ghost"
             size="icon"
@@ -167,11 +189,12 @@ const Topbar = ({
             )}
           </Button>
 
+          {/* Profile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-8 w-8 rounded-full hover:bg-gray-100"
+                className="relative h-8 w-8 rounded-full hover:bg-gray-100 hover:scale-105 transition-transform"
               >
                 <Avatar className="h-8 w-8 border border-gray-200">
                   <AvatarImage
@@ -191,7 +214,7 @@ const Topbar = ({
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 animate-fade-in">
+            <DropdownMenuContent align="end" className="w-56 animate-scale-in">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{userName}</p>
@@ -201,20 +224,20 @@ const Topbar = ({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:scale-105 transition-transform">
                 <User className="mr-2 h-4 w-4" />
                 <span>Meu Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:scale-105 transition-transform">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="hover:scale-105 transition-transform">
                 <HelpCircle className="mr-2 h-4 w-4" />
                 <span>Ajuda & Suporte</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600 hover:scale-105 transition-transform">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>
               </DropdownMenuItem>
@@ -224,66 +247,64 @@ const Topbar = ({
       </div>
 
       {/* Mobile navigation */}
-      <div className="lg:hidden flex overflow-x-auto scrollbar-hide border-t border-gray-100 bg-white">
-        <Link to="/" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            Dashboard
-          </Button>
-        </Link>
-        <Link to="/gerenciamento-de-voos" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            <Plane className="h-3 w-3 mr-1" />
-            Voos
-          </Button>
-        </Link>
-        <Link to="/alocacao-tripulacao" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            <Users className="h-3 w-3 mr-1" />
-            Tripulação
-          </Button>
-        </Link>
-        <Link to="/monitoramento-aeronaves" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            <Wrench className="h-3 w-3 mr-1" />
-            Aeronaves
-          </Button>
-        </Link>
-        <Link to="/relatorios-desempenho" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            <BarChart3 className="h-3 w-3 mr-1" />
-            Relatórios
-          </Button>
-        </Link>
-        <Link to="/gestao-passageiros" className="flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600"
-          >
-            <UserCircle className="h-3 w-3 mr-1" />
-            Passageiros
-          </Button>
-        </Link>
+      <div
+        className={`
+          lg:hidden flex overflow-x-auto scrollbar-hide border-t border-gray-100 bg-white
+          transition-all duration-300 ease-in-out
+          ${isMobileMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}
+        `}
+      >
+        <div className="flex space-x-4 p-4">
+          <Link to="/" className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 hover:scale-105 transition-transform"
+            >
+              Dashboard
+            </Button>
+          </Link>
+          <Link to="/gerenciamento-de-voos" className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 hover:scale-105 transition-transform"
+            >
+              <Plane className="h-3 w-3 mr-1" />
+              Voos
+            </Button>
+          </Link>
+          <Link to="/alocacao-tripulacao" className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 hover:scale-105 transition-transform"
+            >
+              <Users className="h-3 w-3 mr-1" />
+              Tripulação
+            </Button>
+          </Link>
+          <Link to="/monitoramento-aeronaves" className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 hover:scale-105 transition-transform"
+            >
+              <Wrench className="h-3 w-3 mr-1" />
+              Aeronaves
+            </Button>
+          </Link>
+          <Link to="/relatorios-desempenho" className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs rounded-none h-10 px-3 hover:bg-transparent hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 hover:scale-105 transition-transform"
+            >
+              <BarChart3 className="h-3 w-3 mr-1" />
+              Relatórios
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

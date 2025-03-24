@@ -33,6 +33,7 @@ import {
   Check,
   Clock,
   DollarSign,
+  CheckCircle,
 } from "lucide-react";
 
 interface FuelData {
@@ -553,47 +554,30 @@ const FuelControl = ({
                 <CardTitle>Recent Refueling Operations</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Aircraft</TableHead>
-                      <TableHead>Location</TableHead>
-                      <TableHead>Volume</TableHead>
-                      <TableHead>Cost</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Nov 15, 2023</TableCell>
-                      <TableCell>CC-BAW</TableCell>
-                      <TableCell>SCL</TableCell>
-                      <TableCell>45,000 kg</TableCell>
-                      <TableCell>$110,250</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Nov 14, 2023</TableCell>
-                      <TableCell>CC-BGO</TableCell>
-                      <TableCell>LIM</TableCell>
-                      <TableCell>18,000 kg</TableCell>
-                      <TableCell>$47,160</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Nov 13, 2023</TableCell>
-                      <TableCell>CC-COP</TableCell>
-                      <TableCell>BOG</TableCell>
-                      <TableCell>65,000 kg</TableCell>
-                      <TableCell>$167,700</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Nov 13, 2023</TableCell>
-                      <TableCell>CC-DEM</TableCell>
-                      <TableCell>GRU</TableCell>
-                      <TableCell>52,000 kg</TableCell>
-                      <TableCell>$139,360</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-4 p-4 border rounded-lg">
+                    <div className="rounded-full bg-green-100 p-2">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        CC-BAW - Boeing 787-9
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Refueled at SCL
+                      </div>
+                      <div className="flex items-center mt-2">
+                        <Badge className="bg-green-100 text-green-800">
+                          Completed
+                        </Badge>
+                        <span className="text-xs text-gray-500 ml-2">
+                          <Clock className="inline h-3 w-3 mr-1" />
+                          1 hour ago
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -671,7 +655,7 @@ const FuelControl = ({
                 <div className="relative flex-1">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by airport or code..."
+                    placeholder="Search by airport code or name..."
                     className="pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -682,7 +666,7 @@ const FuelControl = ({
                     value={statusFilter}
                     onValueChange={setStatusFilter}
                   >
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[180px]">
                       <Filter className="w-4 h-4 mr-2" />
                       <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>
@@ -703,48 +687,86 @@ const FuelControl = ({
                     <TableHead>Airport</TableHead>
                     <TableHead>Code</TableHead>
                     <TableHead>Current Price</TableHead>
+                    <TableHead>Previous Price</TableHead>
                     <TableHead>Change</TableHead>
                     <TableHead>Available Volume</TableHead>
                     <TableHead>Last Updated</TableHead>
-                    <TableHead>Supplier</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredFuelData.length > 0 ? (
-                    filteredFuelData.map((data) => (
+                    filteredFuelData.map((fuel) => (
                       <TableRow
-                        key={data.id}
+                        key={fuel.id}
                         className="animate-slide-in-up stagger-item"
                         style={{
-                          animationDelay: `${parseInt(data.id) * 0.1}s`,
+                          animationDelay: `${parseInt(fuel.id) * 0.1}s`,
                         }}
                       >
                         <TableCell className="font-medium">
-                          {data.airport}
+                          {fuel.airport}
                         </TableCell>
-                        <TableCell>{data.code}</TableCell>
-                        <TableCell>${data.currentPrice.toFixed(2)}</TableCell>
+                        <TableCell>{fuel.code}</TableCell>
                         <TableCell>
-                          {getPriceChange(data.currentPrice, data.previousPrice)}
+                          ${fuel.currentPrice.toLocaleString()}
                         </TableCell>
                         <TableCell>
-                          {data.availableVolume.toLocaleString()} kg
+                          ${fuel.previousPrice.toLocaleString()}
                         </TableCell>
-                        <TableCell>{data.lastUpdated}</TableCell>
-                        <TableCell>{data.supplier}</TableCell>
-                        <TableCell>{getStatusBadge(data.status)}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm">
-                            Details
-                          </Button>
+                          {getPriceChange(fuel.currentPrice, fuel.previousPrice)}
+                        </TableCell>
+                        <TableCell>
+                          {fuel.availableVolume.toLocaleString()} L
+                        </TableCell>
+                        <TableCell>{fuel.lastUpdated}</TableCell>
+                        <TableCell>
+                          {getStatusBadge(fuel.status)}
                         </TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-4">
+                      <TableCell colSpan={8} className="text-center py-4">
                         No fuel data found matching your criteria.
                       </TableCell>
                     </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="consumption" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Fuel Consumption Trends</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  {/* Add your chart component here */}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Cost Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  {/* Add your chart component here */}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default FuelControl;
