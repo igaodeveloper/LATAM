@@ -1,7 +1,28 @@
 import { supabase } from "@/lib/supabase";
 import type { Database } from "@/types/supabase";
 
-type Passenger = Database["public"]["Tables"]["passengers"]["Row"];
+type PassengerStatus = "active" | "inactive" | "pending" | "cancelled" | "confirmed" | "checked_in";
+
+type Passenger = Database["public"]["Tables"]["passengers"]["Row"] & {
+  status: PassengerStatus;
+  membershipLevel: "standard" | "silver" | "gold" | "platinum";
+  totalFlights: number;
+  lastFlight?: string;
+  preferences?: {
+    seatPreference?: string;
+    mealPreference?: string;
+    specialAssistance?: boolean;
+  };
+  booking: string;
+  flight: string;
+  class: string;
+  departure: Date;
+  arrival: Date;
+  origin: string;
+  destination: string;
+  specialNeeds: string[];
+};
+
 type PassengerInsert = Database["public"]["Tables"]["passengers"]["Insert"];
 type PassengerUpdate = Database["public"]["Tables"]["passengers"]["Update"];
 

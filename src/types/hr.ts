@@ -1,4 +1,4 @@
-export type LeaveType = 'acidente_trabalho' | 'doenca' | 'maternidade' | 'paternidade' | 'ferias' | 'outros';
+export type LeaveType = 'acidente_trabalho' | 'doenca' | 'maternidade' | 'paternidade' | 'ferias';
 
 export type ProcessStatus = 'pendente' | 'aprovado' | 'rejeitado' | 'em_analise' | 'finalizado';
 

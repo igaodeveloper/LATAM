@@ -243,7 +243,7 @@ export const flightService = {
           f.status === "in-flight",
       ).length || 0;
     const delayed =
-      todayFlights?.filter((f) => f.status === "delayed").length || 0;
+      todayFlights?.filter((f) => f.status === "delayed" || f.status === "boarding").length || 0;
     const cancelled =
       todayFlights?.filter((f) => f.status === "cancelled").length || 0;
     const completed =

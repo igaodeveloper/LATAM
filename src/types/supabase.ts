@@ -1,3 +1,5 @@
+import type { Profile, Project, Experience, Education, Skill, Contact } from "./profile";
+
 export type Json =
   | string
   | number
@@ -812,7 +814,85 @@ export interface Database {
             referencedColumns: ["id"];
           }
         ]
-      }
+      };
+      profiles: {
+        Row: Profile;
+        Insert: Omit<Profile, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Profile, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "profiles_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      projects: {
+        Row: Project;
+        Insert: Omit<Project, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Project, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "projects_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      experiences: {
+        Row: Experience;
+        Insert: Omit<Experience, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Experience, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "experiences_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      education: {
+        Row: Education;
+        Insert: Omit<Education, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Education, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "education_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      skills: {
+        Row: Skill;
+        Insert: Omit<Skill, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Skill, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "skills_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      contacts: {
+        Row: Contact;
+        Insert: Omit<Contact, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<Contact, "id">>;
+        Relationships: [
+          {
+            foreignKeyName: "contacts_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

@@ -92,7 +92,7 @@ const Profile = () => {
                 </div>
                 <div className="space-y-1">
                   <Label>Status</Label>
-                  <Badge variant="success">{user.status}</Badge>
+                  <Badge variant="default">{user.status}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -256,7 +256,7 @@ const Profile = () => {
                           </p>
                           <p className="text-sm text-muted-foreground">{booking.date}</p>
                         </div>
-                        <Badge variant={booking.status === 'Confirmed' ? 'success' : 'warning'}>
+                        <Badge variant={booking.status === 'Confirmed' ? 'default' : 'destructive'}>
                           {booking.status}
                         </Badge>
                       </div>

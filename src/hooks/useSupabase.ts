@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
+import type { RealtimeChannel, RealtimePostgresChangesPayload, RealtimePostgresChangesFilter } from '@supabase/realtime-js';
+import { REALTIME_LISTEN_TYPES } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
+
+type TableName = keyof Database['public']['Tables'];
+type Row<T extends TableName> = Database['public']['Tables'][T]['Row'];
 
 export function useSupabase() {
   const [session, setSession] = useState<Session | null>(null);
@@ -106,18 +112,16 @@ export function useSupabaseRealtime<T = any>(
     // Set up realtime subscription
     let subscription = supabase
       .channel("table-changes")
-      .on(
-        "postgres_changes",
+      .on('system',
         {
           event: options?.event || "*",
           schema: "public",
-          table,
-          ...(options?.filter && options?.filterValue
-            ? { filter: `${options.filter}=eq.${options.filterValue}` }
-            : {}),
+          table: table,
+          filter: options?.filter && options?.filterValue
+            ? `${options.filter}=eq.${options.filterValue}`
+            : undefined
         },
         async (payload) => {
-          // Refetch data when changes occur
           try {
             const { data, error } = await initialQuery();
             if (error) throw error;
@@ -125,7 +129,7 @@ export function useSupabaseRealtime<T = any>(
           } catch (error) {
             console.error("Error refetching after realtime update:", error);
           }
-        },
+        }
       )
       .subscribe();
 
@@ -153,4 +157,80 @@ export function useSupabaseRealtime<T = any>(
       }
     },
   };
+}
+
+export function useSupabaseTable<T extends TableName>(
+  tableName: T,
+  options: {
+    event?: 'INSERT' | 'UPDATE' | 'DELETE';
+    filter?: string;
+  } = {}
+) {
+  const [data, setData] = useState<Row<T>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+
+  useEffect(() => {
+    fetchData();
+    subscribeToChanges();
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
+  }, [tableName]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { data: initialData, error: queryError } = await supabase
+        .from(tableName)
+        .select('*');
+
+      if (queryError) {
+        throw queryError;
+      }
+
+      setData(initialData as Row<T>[]);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const subscribeToChanges = () => {
+    const newChannel = supabase
+      .channel('table_changes')
+      .on('system',
+        {
+          event: options.event || "*",
+          schema: 'public',
+          table: tableName,
+          filter: options.filter
+        },
+        (payload: RealtimePostgresChangesPayload<Row<T>>) => {
+          if (payload.eventType === 'INSERT') {
+            setData((current) => [...current, payload.new]);
+          } else if (payload.eventType === 'UPDATE') {
+            setData((current) =>
+              current.map((item) =>
+                item.id === payload.new.id ? payload.new : item
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setData((current) =>
+              current.filter((item) => item.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    setChannel(newChannel);
+  };
+
+  return { data, loading, error };
 }

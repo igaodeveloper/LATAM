@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { cloneElement } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -55,11 +55,15 @@ const listVariants = cva("", {
 
 export interface AnimatedListProps
   extends React.HTMLAttributes<HTMLUListElement>,
-    VariantProps<typeof listVariants> {}
+    VariantProps<typeof listVariants> {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}
 
 const AnimatedList = React.forwardRef<HTMLUListElement, AnimatedListProps>(
   (
-    { className, variant, animation, itemAnimation, columns, hover, ...props },
+    { className, variant, animation, itemAnimation, columns, hover, children, delay = 0.1 },
     ref,
   ) => {
     // Apply staggered animation class to parent if staggered animation is selected
@@ -67,10 +71,10 @@ const AnimatedList = React.forwardRef<HTMLUListElement, AnimatedListProps>(
 
     // Apply item animation class to children
     const childrenWithAnimation = React.Children.map(
-      props.children,
+      children,
       (child, index) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
+          return cloneElement(child as React.ReactElement, {
             className: cn(
               child.props.className,
               itemAnimation,
@@ -79,7 +83,7 @@ const AnimatedList = React.forwardRef<HTMLUListElement, AnimatedListProps>(
             style: {
               ...child.props.style,
               animationDelay:
-                animation === "staggered" ? `${index * 0.1}s` : undefined,
+                animation === "staggered" ? `${index * delay}s` : undefined,
             },
           });
         }
@@ -95,7 +99,6 @@ const AnimatedList = React.forwardRef<HTMLUListElement, AnimatedListProps>(
           className,
         )}
         ref={ref}
-        {...props}
       >
         {childrenWithAnimation}
       </ul>

@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/supabase'
 import { Employee, Termination, Leave, Document, Notification, ProcessHistory, CalculationParameters } from '../types/hr'
+import { supabase } from "@/lib/supabase";
 
-const supabase = createClient<Database>(
+const supabaseClient = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
@@ -10,7 +11,7 @@ const supabase = createClient<Database>(
 export class HRService {
   // Employee Management
   async getEmployee(id: string): Promise<Employee | null> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('employees')
       .select('*')
       .eq('id', id)
@@ -21,7 +22,7 @@ export class HRService {
   }
 
   async getEmployees(): Promise<Employee[]> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('employees')
       .select('*')
       .order('name')
@@ -31,7 +32,7 @@ export class HRService {
   }
 
   async createEmployee(employee: Omit<Employee, 'id' | 'created_at' | 'updated_at'>): Promise<Employee> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('employees')
       .insert(employee)
       .select()
@@ -42,7 +43,7 @@ export class HRService {
   }
 
   async updateEmployee(id: string, employee: Partial<Employee>): Promise<Employee> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('employees')
       .update(employee)
       .eq('id', id)
@@ -56,98 +57,126 @@ export class HRService {
   // Termination Management
   async getTermination(id: string): Promise<Termination | null> {
     const { data, error } = await supabase
-      .from('terminations')
-      .select('*')
-      .eq('id', id)
-      .single()
+      .from("terminations")
+      .select("*, documents(*)")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error fetching termination:", error);
+      return null;
+    }
+
+    return data as Termination;
   }
 
-  async getEmployeeTerminations(employeeId: string): Promise<Termination[]> {
+  async getTerminations(): Promise<Termination[]> {
     const { data, error } = await supabase
-      .from('terminations')
-      .select('*')
-      .eq('employee_id', employeeId)
-      .order('created_at', { ascending: false })
+      .from("terminations")
+      .select("*, documents(*)");
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error fetching terminations:", error);
+      return [];
+    }
+
+    return data as Termination[];
   }
 
-  async createTermination(termination: Omit<Termination, 'id' | 'created_at' | 'updated_at'>): Promise<Termination> {
+  async createTermination(termination: Omit<Termination, "id" | "created_at" | "updated_at">): Promise<Termination | null> {
     const { data, error } = await supabase
-      .from('terminations')
-      .insert(termination)
+      .from("terminations")
+      .insert([termination])
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error creating termination:", error);
+      return null;
+    }
+
+    return data as Termination;
   }
 
-  async updateTerminationStatus(id: string, status: Termination['status']): Promise<Termination> {
+  async updateTermination(id: string, termination: Partial<Termination>): Promise<Termination | null> {
     const { data, error } = await supabase
-      .from('terminations')
-      .update({ status })
-      .eq('id', id)
+      .from("terminations")
+      .update(termination)
+      .eq("id", id)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error updating termination:", error);
+      return null;
+    }
+
+    return data as Termination;
   }
 
   // Leave Management
   async getLeave(id: string): Promise<Leave | null> {
     const { data, error } = await supabase
-      .from('leaves')
-      .select('*')
-      .eq('id', id)
-      .single()
+      .from("leaves")
+      .select("*, documents(*)")
+      .eq("id", id)
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error fetching leave:", error);
+      return null;
+    }
+
+    return data as Leave;
   }
 
-  async getEmployeeLeaves(employeeId: string): Promise<Leave[]> {
+  async getLeaves(): Promise<Leave[]> {
     const { data, error } = await supabase
-      .from('leaves')
-      .select('*')
-      .eq('employee_id', employeeId)
-      .order('created_at', { ascending: false })
+      .from("leaves")
+      .select("*, documents(*)");
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error fetching leaves:", error);
+      return [];
+    }
+
+    return data as Leave[];
   }
 
-  async createLeave(leave: Omit<Leave, 'id' | 'created_at' | 'updated_at'>): Promise<Leave> {
+  async createLeave(leave: Omit<Leave, "id" | "created_at" | "updated_at">): Promise<Leave | null> {
     const { data, error } = await supabase
-      .from('leaves')
-      .insert(leave)
+      .from("leaves")
+      .insert([leave])
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error creating leave:", error);
+      return null;
+    }
+
+    return data as Leave;
   }
 
-  async updateLeaveStatus(id: string, status: Leave['status']): Promise<Leave> {
+  async updateLeave(id: string, leave: Partial<Leave>): Promise<Leave | null> {
     const { data, error } = await supabase
-      .from('leaves')
-      .update({ status })
-      .eq('id', id)
+      .from("leaves")
+      .update(leave)
+      .eq("id", id)
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) {
+      console.error("Error updating leave:", error);
+      return null;
+    }
+
+    return data as Leave;
   }
 
   // Document Management
   async uploadDocument(document: Omit<Document, 'id' | 'uploaded_at'>): Promise<Document> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('documents')
       .insert(document)
       .select()
@@ -158,7 +187,7 @@ export class HRService {
   }
 
   async getProcessDocuments(processId: string, processType: Document['process_type']): Promise<Document[]> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('documents')
       .select('*')
       .eq('process_id', processId)
@@ -171,7 +200,7 @@ export class HRService {
 
   // Notification Management
   async createNotification(notification: Omit<Notification, 'id' | 'created_at'>): Promise<Notification> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('notifications')
       .insert(notification)
       .select()
@@ -182,7 +211,7 @@ export class HRService {
   }
 
   async getEmployeeNotifications(employeeId: string): Promise<Notification[]> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('notifications')
       .select('*')
       .eq('employee_id', employeeId)
@@ -193,7 +222,7 @@ export class HRService {
   }
 
   async markNotificationAsRead(id: string): Promise<Notification> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('notifications')
       .update({ read: true })
       .eq('id', id)
@@ -206,7 +235,7 @@ export class HRService {
 
   // Process History Management
   async createProcessHistory(history: Omit<ProcessHistory, 'id' | 'created_at'>): Promise<ProcessHistory> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('process_history')
       .insert(history)
       .select()
@@ -217,7 +246,7 @@ export class HRService {
   }
 
   async getProcessHistory(processId: string, processType: ProcessHistory['process_type']): Promise<ProcessHistory[]> {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('process_history')
       .select('*')
       .eq('process_id', processId)
@@ -229,66 +258,73 @@ export class HRService {
   }
 
   // Calculation Methods
-  calculateTerminationAmounts(params: CalculationParameters): {
-    salary_balance: number
-    vacation_balance: number
-    thirteenth_salary: number
-    notice_period: number
-    fgts_fine: number
-    other_benefits: number
-    deductions: number
-    total_amount: number
+  calculateTerminationValues(params: CalculationParameters): {
+    salary: number;
+    vacation: number;
+    thirteenth: number;
+    fgts: number;
+    fgtsFine: number;
+    otherBenefits: number;
+    deductions: number;
+    total: number;
   } {
     const {
-      salary,
+      base_salary,
+      months_worked,
+      vacation_days,
+      notice_period,
+      has_fgts_penalty,
+      other_benefits,
+      deductions,
       termination_date,
       last_vacation_date,
-      last_thirteenth_salary_date,
-      notice_period_days,
-      has_fgts_fine,
-      other_benefits_amount,
-      deductions_amount
-    } = params
+      last_thirteenth_date
+    } = params;
 
-    // Calculate salary balance
-    const daysInMonth = new Date(termination_date.getFullYear(), termination_date.getMonth() + 1, 0).getDate()
-    const daysWorked = termination_date.getDate()
-    const salary_balance = (salary / daysInMonth) * daysWorked
+    // Calculate proportional salary
+    const daysInMonth = new Date(termination_date.getFullYear(), termination_date.getMonth() + 1, 0).getDate();
+    const daysWorked = termination_date.getDate();
+    const proportionalSalary = (base_salary / daysInMonth) * daysWorked;
 
-    // Calculate vacation balance
-    const vacation_days = 30 // Assuming 30 days of vacation per year
-    const monthsSinceLastVacation = this.getMonthsDifference(last_vacation_date, termination_date)
-    const vacation_balance = (salary / 3) * (monthsSinceLastVacation / 12) * vacation_days
+    // Calculate vacation
+    const monthsSinceLastVacation = last_vacation_date
+      ? this.getMonthsDifference(last_vacation_date, termination_date)
+      : months_worked;
+    const proportionalVacation = (base_salary / 12) * monthsSinceLastVacation;
+    const vacationBonus = proportionalVacation / 3;
+    const totalVacation = proportionalVacation + vacationBonus;
 
-    // Calculate thirteenth salary
-    const monthsSinceLastThirteenth = this.getMonthsDifference(last_thirteenth_salary_date, termination_date)
-    const thirteenth_salary = (salary / 12) * monthsSinceLastThirteenth
+    // Calculate 13th salary
+    const monthsSinceLastThirteenth = last_thirteenth_date
+      ? this.getMonthsDifference(last_thirteenth_date, termination_date)
+      : months_worked;
+    const thirteenthSalary = (base_salary / 12) * monthsSinceLastThirteenth;
 
-    // Calculate notice period
-    const notice_period = (salary / 30) * notice_period_days
-
-    // Calculate FGTS fine (40% of FGTS balance)
-    const fgts_fine = has_fgts_fine ? salary * 0.08 * 0.4 : 0
+    // Calculate FGTS
+    const fgtsMonthly = base_salary * 0.08;
+    const fgtsTotal = fgtsMonthly * months_worked;
+    const fgtsFine = has_fgts_penalty ? fgtsTotal * 0.4 : 0;
 
     // Calculate total
-    const total_amount = salary_balance +
-      vacation_balance +
-      thirteenth_salary +
-      notice_period +
-      fgts_fine +
-      other_benefits_amount -
-      deductions_amount
+    const total =
+      proportionalSalary +
+      totalVacation +
+      thirteenthSalary +
+      fgtsTotal +
+      fgtsFine +
+      other_benefits -
+      deductions;
 
     return {
-      salary_balance,
-      vacation_balance,
-      thirteenth_salary,
-      notice_period,
-      fgts_fine,
-      other_benefits: other_benefits_amount,
-      deductions: deductions_amount,
-      total_amount
-    }
+      salary: proportionalSalary,
+      vacation: totalVacation,
+      thirteenth: thirteenthSalary,
+      fgts: fgtsTotal,
+      fgtsFine,
+      otherBenefits: other_benefits,
+      deductions,
+      total,
+    };
   }
 
   calculateLeaveAmounts(params: {
@@ -337,8 +373,11 @@ export class HRService {
 
   // Helper Methods
   private getMonthsDifference(startDate: Date, endDate: Date): number {
-    return (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-      endDate.getMonth() - startDate.getMonth()
+    return (
+      (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+      endDate.getMonth() -
+      startDate.getMonth()
+    );
   }
 
   private getDaysDifference(startDate: Date, endDate: Date): number {

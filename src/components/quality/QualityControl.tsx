@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Plane, AlertCircle, CheckCircle, Clock, Calendar, Tool, Box, ArrowUp, ArrowDown, ClipboardCheck, FileCheck, ShieldCheck } from "lucide-react";
+import { Search, Filter, Plus, Plane, AlertCircle, CheckCircle, Clock, Calendar, Wrench, Box, ArrowUp, ArrowDown, ClipboardCheck, FileCheck, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 

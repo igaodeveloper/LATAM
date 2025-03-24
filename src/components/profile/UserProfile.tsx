@@ -54,6 +54,13 @@ import {
   Clipboard,
   PieChart,
 } from "lucide-react";
+import {
+  Select as UISelect,
+  SelectContent as UISelectContent,
+  SelectItem as UISelectItem,
+  SelectTrigger as UISelectTrigger,
+  SelectValue as UISelectValue,
+} from "@/components/ui/select";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("personal");
@@ -779,16 +786,16 @@ const UserProfile = () => {
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold">Voos Recentes</h3>
                   <div className="flex gap-2">
-                    <Select defaultValue="recent">
-                      <SelectTrigger className="w-[150px]">
-                        <SelectValue placeholder="Filtrar por" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="recent">Mais Recentes</SelectItem>
-                        <SelectItem value="duration">Maior Duração</SelectItem>
-                        <SelectItem value="route">Por Rota</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <UISelect defaultValue="recent">
+                      <UISelectTrigger className="w-[150px]">
+                        <UISelectValue placeholder="Filtrar por" />
+                      </UISelectTrigger>
+                      <UISelectContent>
+                        <UISelectItem value="recent">Mais Recentes</UISelectItem>
+                        <UISelectItem value="duration">Maior Duração</UISelectItem>
+                        <UISelectItem value="route">Por Rota</UISelectItem>
+                      </UISelectContent>
+                    </UISelect>
                     <Button variant="outline" size="icon">
                       <Download className="h-4 w-4" />
                     </Button>
@@ -1058,17 +1065,17 @@ const UserProfile = () => {
                   <h3 className="text-lg font-semibold">
                     Métricas de Desempenho
                   </h3>
-                  <Select defaultValue="6months">
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Período" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="3months">Últimos 3 meses</SelectItem>
-                      <SelectItem value="6months">Últimos 6 meses</SelectItem>
-                      <SelectItem value="1year">Último ano</SelectItem>
-                      <SelectItem value="all">Todo histórico</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <UISelect defaultValue="6months">
+                    <UISelectTrigger className="w-[180px]">
+                      <UISelectValue placeholder="Período" />
+                    </UISelectTrigger>
+                    <UISelectContent>
+                      <UISelectItem value="3months">Últimos 3 meses</UISelectItem>
+                      <UISelectItem value="6months">Últimos 6 meses</UISelectItem>
+                      <UISelectItem value="1year">Último ano</UISelectItem>
+                      <UISelectItem value="all">Todo histórico</UISelectItem>
+                    </UISelectContent>
+                  </UISelect>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1277,16 +1284,16 @@ const UserProfile = () => {
                             >
                               <span>Tema da Interface</span>
                             </Label>
-                            <Select defaultValue="light">
-                              <SelectTrigger className="w-[120px]">
-                                <SelectValue placeholder="Tema" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="light">Claro</SelectItem>
-                                <SelectItem value="dark">Escuro</SelectItem>
-                                <SelectItem value="system">Sistema</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <UISelect defaultValue="light">
+                              <UISelectTrigger className="w-[120px]">
+                                <UISelectValue placeholder="Tema" />
+                              </UISelectTrigger>
+                              <UISelectContent>
+                                <UISelectItem value="light">Claro</UISelectItem>
+                                <UISelectItem value="dark">Escuro</UISelectItem>
+                                <UISelectItem value="system">Sistema</UISelectItem>
+                              </UISelectContent>
+                            </UISelect>
                           </div>
 
                           <div className="flex items-center justify-between">
@@ -1296,16 +1303,16 @@ const UserProfile = () => {
                             >
                               <span>Idioma</span>
                             </Label>
-                            <Select defaultValue="pt-BR">
-                              <SelectTrigger className="w-[120px]">
-                                <SelectValue placeholder="Idioma" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="pt-BR">Português</SelectItem>
-                                <SelectItem value="en-US">English</SelectItem>
-                                <SelectItem value="es-ES">Español</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <UISelect defaultValue="pt-BR">
+                              <UISelectTrigger className="w-[120px]">
+                                <UISelectValue placeholder="Idioma" />
+                              </UISelectTrigger>
+                              <UISelectContent>
+                                <UISelectItem value="pt-BR">Português</UISelectItem>
+                                <UISelectItem value="en-US">English</UISelectItem>
+                                <UISelectItem value="es-ES">Español</UISelectItem>
+                              </UISelectContent>
+                            </UISelect>
                           </div>
                         </div>
                       </div>

@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { HelpCircle, Phone, Mail, MessageSquare, Clock, MapPin, Globe, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle, Plane, Ticket, Baggage, CreditCard, User, Shield } from "lucide-react";
+import { HelpCircle, Phone, Mail, MessageSquare, Clock, MapPin, Globe, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle, Plane, Ticket, Luggage, CreditCard, User, Shield } from "lucide-react";
 
 const Support = () => {
   const [formData, setFormData] = useState({
@@ -52,7 +52,7 @@ const Support = () => {
       email: "bagagem@latam.com",
       phone: "+56 2 565-3456",
       hours: "24/7",
-      icon: Baggage,
+      icon: Luggage,
     },
     {
       id: "billing",
@@ -340,7 +340,7 @@ const Support = () => {
                             Políticas de Reserva
                           </Button>
                           <Button variant="outline" className="w-full justify-start">
-                            <Baggage className="h-4 w-4 mr-2" />
+                            <Luggage className="h-4 w-4 mr-2" />
                             Políticas de Bagagem
                           </Button>
                           <Button variant="outline" className="w-full justify-start">
@@ -392,7 +392,7 @@ const Support = () => {
                   Políticas de Reserva
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Baggage className="h-4 w-4 mr-2" />
+                  <Luggage className="h-4 w-4 mr-2" />
                   Políticas de Bagagem
                 </Button>
                 <Button variant="outline" className="w-full justify-start">

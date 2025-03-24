@@ -67,7 +67,7 @@ interface Passenger {
   name: string;
   email: string;
   phone: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "pending" | "cancelled" | "confirmed" | "checked_in";
   membershipLevel: "standard" | "silver" | "gold" | "platinum";
   totalFlights: number;
   lastFlight?: string;

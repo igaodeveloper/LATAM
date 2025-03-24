@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Download, FileText, BarChart, PieChart, LineChart, Calendar, Clock, User, FileSpreadsheet, FilePdf, FileWord, Mail, Share2, Eye, Edit, Trash2 } from "lucide-react";
+import { Search, Filter, Plus, Download, FileText, BarChart, PieChart, LineChart, Calendar, Clock, User, FileSpreadsheet, File, FileText as FileWordIcon, Mail, Share2, Eye, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -137,7 +137,7 @@ const Reporting = () => {
       case "excel":
         return <FileSpreadsheet className="h-4 w-4" />;
       case "word":
-        return <FileWord className="h-4 w-4" />;
+        return <FileWordIcon className="h-4 w-4" />;
       case "dashboard":
         return <BarChart className="h-4 w-4" />;
       default:
