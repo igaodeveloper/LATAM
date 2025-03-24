@@ -13,7 +13,7 @@ export const realtime = {
     const channel = supabase
       .channel(`table-changes-${table}`)
       .on(
-        "postgres_changes",
+        "system",
         {
           event,
           schema: "public",

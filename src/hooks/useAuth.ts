@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { authService } from '../services/auth.service';
 import { databaseService } from '../services/database.service';
 import { Profile } from '../types/database';
@@ -22,16 +22,15 @@ export function useAuth() {
   useEffect(() => {
     // Get initial session
     const initializeAuth = async () => {
+      setState(prev => ({ ...prev, loading: true }));
       try {
         const { data: user, error: userError } = await authService.getCurrentUser();
         
         if (userError) throw userError;
 
         if (user) {
-          const { data: profile, error: profileError } = await databaseService.getProfile(user.id);
+          const profile = await databaseService.getProfile(user.id);
           
-          if (profileError) throw profileError;
-
           setState({
             user,
             profile,
@@ -61,21 +60,21 @@ export function useAuth() {
     // Subscribe to auth changes
     const { data: { subscription } } = authService.subscribeToAuthChanges(async (event, session) => {
       if (session?.user) {
-        const { data: profile, error: profileError } = await databaseService.getProfile(session.user.id);
-        
-        if (profileError) {
-          setState({
-            user: session.user,
-            profile: null,
-            loading: false,
-            error: profileError,
-          });
-        } else {
+        try {
+          const profile = await databaseService.getProfile(session.user.id);
+          
           setState({
             user: session.user,
             profile,
             loading: false,
             error: null,
+          });
+        } catch (error) {
+          setState({
+            user: session.user,
+            profile: null,
+            loading: false,
+            error: error instanceof Error ? error.message : 'An error occurred',
           });
         }
       } else {
@@ -141,22 +140,20 @@ export function useAuth() {
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
-    if (!state.user) throw new Error('No user logged in');
+    if (!state.user) {
+      throw new Error("Cannot update profile: no user logged in");
+    }
     
     setState((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const { data: profile, error } = await databaseService.updateProfile({
-        ...updates,
-        user_id: state.user.id,
-      });
+      const profile = await databaseService.updateProfile(state.user.id, updates);
       
-      if (error) throw error;
+      if (!profile) throw new Error("Failed to update profile");
       
       setState((prev) => ({
         ...prev,
         profile,
         loading: false,
-        error: null,
       }));
       
       return profile;

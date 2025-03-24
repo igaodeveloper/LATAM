@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Building2, Phone, Mail, Globe, MapPin, Package, AlertCircle, CheckCircle, Clock, Calendar, Tool, Box, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Filter, Plus, Building2, Phone, Mail, Globe, MapPin, Package, AlertCircle, CheckCircle, Clock, Calendar, Box, ArrowUp, ArrowDown, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -222,7 +222,7 @@ const SupplierManagement = () => {
                             supplier.category
                           )}`}
                         >
-                          <Tool className="h-4 w-4 mr-1" />
+                          <Wrench className="h-4 w-4 mr-1" />
                           <span className="capitalize">
                             {supplier.category === "engine" ? "Motor" : supplier.category === "landing_gear" ? "Trem de Pouso" : "Aviônicos"}
                           </span>

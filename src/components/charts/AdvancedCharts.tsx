@@ -29,6 +29,7 @@ import {
   Brush,
   ReferenceLine,
 } from "recharts";
+import { Card } from "../ui/card";
 
 // Flight Status Data
 const flightStatusData = [

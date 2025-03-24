@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
-import { Search, HelpCircle, Plane, Ticket, Baggage, CreditCard, Clock, User, Shield, Globe, Phone, Mail, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle } from "lucide-react";
+import { Search, HelpCircle, Plane, Ticket, CreditCard, Clock, User, Shield, Globe, Phone, Mail, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle } from "lucide-react";
 
 const FAQ = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -376,10 +376,6 @@ const FAQ = () => {
                 <Button variant="outline" className="w-full justify-start">
                   <Ticket className="h-4 w-4 mr-2" />
                   Políticas de Reserva
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Baggage className="h-4 w-4 mr-2" />
-                  Políticas de Bagagem
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <CreditCard className="h-4 w-4 mr-2" />

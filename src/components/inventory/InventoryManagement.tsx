@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Package, AlertCircle, CheckCircle, Clock, Calendar, Tool, Box, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Filter, Plus, Package, AlertCircle, CheckCircle, Clock, Calendar, Box, ArrowUp, ArrowDown, Wrench } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -206,7 +206,7 @@ const InventoryManagement = () => {
                             item.category
                           )}`}
                         >
-                          <Tool className="h-4 w-4 mr-1" />
+                          <Wrench className="h-4 w-4 mr-1" />
                           <span className="capitalize">
                             {item.category === "engine" ? "Motor" : item.category === "landing_gear" ? "Trem de Pouso" : "Aviônicos"}
                           </span>

@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Plane, Wrench, AlertCircle, CheckCircle, Clock, Calendar, Tool, User, FileText } from "lucide-react";
+import { Search, Filter, Plus, Plane, Wrench, AlertCircle, CheckCircle, Clock, Calendar, User, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -260,7 +260,7 @@ const MaintenanceManagement = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
-                          <Tool className="h-4 w-4 mr-1 text-blue-600" />
+                          <Wrench className="h-4 w-4 mr-1 text-blue-600" />
                           <span className="capitalize">{task.type}</span>
                         </div>
                       </TableCell>

@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { MessageSquare, Mail, Phone, Clock, MapPin, Globe, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle, Plane, Ticket, Baggage, CreditCard, User, Shield, Search, Send, Paperclip, Smile, MoreVertical } from "lucide-react";
+import { MessageSquare, Mail, Phone, Clock, MapPin, Globe, Calendar, Users, Database, AlertCircle, Info, CheckCircle, XCircle, Plane, Ticket, CreditCard, User, Shield, Search, Send, Paperclip, Smile, MoreVertical } from "lucide-react";
 
 const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");

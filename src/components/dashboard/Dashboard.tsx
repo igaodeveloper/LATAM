@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,9 @@ import {
   TrendingUp,
   TrendingDown,
   Bell,
+  LineChart,
+  PieChart,
+  Star
 } from "lucide-react";
 import AlertsPanel from "./AlertsPanel";
 import FlightStatusOverview from "./FlightStatusOverview";
@@ -73,11 +76,10 @@ const KPICard = ({
                 )}
                 {change}%
               </span>
-              <span className="text-xs text-gray-500 ml-1">vs last period</span>
             </div>
           </div>
           <div
-            className={`h-12 w-12 rounded-full bg-${color}-100 flex items-center justify-center text-${color}-500 animate-pulse`}
+            className={`p-3 rounded-full bg-${color}-100 text-${color}-500`}
           >
             {icon}
           </div>

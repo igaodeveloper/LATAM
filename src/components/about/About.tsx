@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Building2, Users, Target, Award, Globe, MapPin, Phone, Mail, Clock, Calendar, Briefcase, GraduationCap, Award2, Globe2, MapPin2, Phone2, Mail2, Clock2, Calendar2, Briefcase2, GraduationCap2, Award3, Globe3, MapPin3, Phone3, Mail3, Clock3, Calendar3, Briefcase3, GraduationCap3, Award4, Globe4, MapPin4, Phone4, Mail4, Clock4, Calendar4, Briefcase4, GraduationCap4 } from "lucide-react";
+import { Building2, Users, Target, Award, Globe, MapPin, Phone, Mail, Clock, Calendar, Briefcase, GraduationCap, Leaf, Shield, CheckCircle, DollarSign, Lightbulb } from "lucide-react";
 
 const About = () => {
   const companyInfo = {
@@ -292,28 +292,28 @@ const About = () => {
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <MapPin2 className="h-5 w-5 text-primary mt-0.5" />
+                  <MapPin className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Endereço</p>
                     <p className="text-sm text-gray-500">{contactInfo.address}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Phone2 className="h-5 w-5 text-primary mt-0.5" />
+                  <Phone className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Telefone</p>
                     <p className="text-sm text-gray-500">{contactInfo.phone}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Mail2 className="h-5 w-5 text-primary mt-0.5" />
+                  <Mail className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Email</p>
                     <p className="text-sm text-gray-500">{contactInfo.email}</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Clock2 className="h-5 w-5 text-primary mt-0.5" />
+                  <Clock className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <p className="text-sm font-medium">Horário</p>
                     <p className="text-sm text-gray-500">{contactInfo.hours}</p>
@@ -324,13 +324,13 @@ const About = () => {
                   <h3 className="text-sm font-medium mb-2">Redes Sociais</h3>
                   <div className="flex space-x-4">
                     <Button variant="outline" size="icon">
-                      <Globe2 className="h-4 w-4" />
+                      <Globe className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="icon">
-                      <Globe3 className="h-4 w-4" />
+                      <Globe className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="icon">
-                      <Globe4 className="h-4 w-4" />
+                      <Globe className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

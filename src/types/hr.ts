@@ -83,9 +83,17 @@ export interface ProcessHistory {
 }
 
 export interface CalculationParameters {
-  salary: number;
-  admission_date: string;
-  termination_date?: string;
+  base_salary: number;
+  months_worked: number;
+  vacation_days: number;
+  notice_period: number;
+  has_fgts_penalty: boolean;
+  other_benefits: number;
+  deductions: number;
+  termination_date: Date;
+  last_vacation_date?: Date;
+  last_thirteenth_date?: Date;
+  admission_date?: string;
   leave_start_date?: string;
   leave_end_date?: string;
   leave_type?: LeaveType;

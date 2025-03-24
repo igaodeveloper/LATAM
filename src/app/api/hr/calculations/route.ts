@@ -7,7 +7,7 @@ const hrService = new HRService()
 export async function POST(request: Request) {
   try {
     const params = await request.json() as CalculationParameters
-    const amounts = hrService.calculateTerminationAmounts(params)
+    const amounts = hrService.calculateTerminationValues(params)
     return NextResponse.json(amounts)
   } catch (error) {
     console.error('Error calculating amounts:', error)

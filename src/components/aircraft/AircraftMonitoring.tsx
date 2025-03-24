@@ -110,6 +110,36 @@ const AircraftMonitoring = () => {
   const [maintenanceDialog, setMaintenanceDialog] = useState(false);
   const [selectedAircraft, setSelectedAircraft] = useState<Aircraft | null>(null);
 
+  const maintenanceRecords = [
+    {
+      id: "MNT001",
+      aircraftId: "AC001",
+      type: "routine",
+      date: new Date(),
+      description: "Routine maintenance check",
+      technician: "João Silva",
+      status: "completed",
+    },
+    {
+      id: "MNT002",
+      aircraftId: "AC002",
+      type: "repair",
+      date: new Date(),
+      description: "Engine repair",
+      technician: "Maria Santos",
+      status: "in_progress",
+    },
+    {
+      id: "MNT003",
+      aircraftId: "AC001",
+      type: "inspection",
+      date: new Date(),
+      description: "Annual inspection",
+      technician: "Carlos Oliveira",
+      status: "scheduled",
+    },
+  ];
+
   const filteredAircraft = aircraft.filter((aircraft) => {
     const matchesSearch =
       aircraft.registration.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -149,6 +179,19 @@ const AircraftMonitoring = () => {
         (record) => record.aircraftId === selectedAircraft.id,
       )
     : [];
+
+  const getMaintenanceStatusBadge = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <Badge className="bg-green-500 hover:bg-green-600">Completo</Badge>;
+      case "in_progress":
+        return <Badge className="bg-blue-500 hover:bg-blue-600">Em Andamento</Badge>;
+      case "scheduled":
+        return <Badge className="bg-yellow-500 hover:bg-yellow-600">Agendado</Badge>;
+      default:
+        return <Badge className="bg-gray-500 hover:bg-gray-600">Desconhecido</Badge>;
+    }
+  };
 
   return (
     <div className="p-6">
@@ -340,7 +383,7 @@ const AircraftMonitoring = () => {
                     <TableRow key={record.id}>
                       <TableCell className="font-medium">{record.id}</TableCell>
                       <TableCell>{record.type}</TableCell>
-                      <TableCell>{record.date}</TableCell>
+                      <TableCell>{record.date.toLocaleDateString()}</TableCell>
                       <TableCell>{record.description}</TableCell>
                       <TableCell>{record.technician}</TableCell>
                       <TableCell>

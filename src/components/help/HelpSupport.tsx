@@ -5,7 +5,8 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Search, HelpCircle, BookOpen, MessageSquare, Phone, Mail, FileText, Video, Book, FileQuestion, MessageCircle, PhoneCall, Mail2, FileText2, Video2, Book2, FileQuestion2, MessageCircle2, PhoneCall2, Mail3, FileText3, Video3, Book3, FileQuestion3, MessageCircle3, PhoneCall3, Mail4, FileText4, Video4, Book4, FileQuestion4, MessageCircle4, PhoneCall4 } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Search, HelpCircle, BookOpen, MessageSquare, Phone, Mail, FileText, Video, Book, FileQuestion, MessageCircle, PhoneCall, Clock } from "lucide-react";
 
 const HelpSupport = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -365,87 +366,87 @@ const HelpSupport = () => {
                   Suporte por Telefone
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Mail2 className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 mr-2" />
                   Enviar Email
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileText2 className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Base de Conhecimento
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Video2 className="h-4 w-4 mr-2" />
+                  <Video className="h-4 w-4 mr-2" />
                   Tutoriais em Vídeo
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Book2 className="h-4 w-4 mr-2" />
+                  <Book className="h-4 w-4 mr-2" />
                   Guias do Usuário
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileQuestion2 className="h-4 w-4 mr-2" />
+                  <FileQuestion className="h-4 w-4 mr-2" />
                   FAQ
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <MessageCircle2 className="h-4 w-4 mr-2" />
+                  <MessageCircle className="h-4 w-4 mr-2" />
                   Fórum de Discussão
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <PhoneCall2 className="h-4 w-4 mr-2" />
+                  <PhoneCall className="h-4 w-4 mr-2" />
                   Números de Emergência
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Mail3 className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 mr-2" />
                   Newsletter
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileText3 className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Documentação Técnica
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Video3 className="h-4 w-4 mr-2" />
+                  <Video className="h-4 w-4 mr-2" />
                   Webinars
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Book3 className="h-4 w-4 mr-2" />
+                  <Book className="h-4 w-4 mr-2" />
                   Treinamentos
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileQuestion3 className="h-4 w-4 mr-2" />
+                  <FileQuestion className="h-4 w-4 mr-2" />
                   Centro de Ajuda
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <MessageCircle3 className="h-4 w-4 mr-2" />
+                  <MessageCircle className="h-4 w-4 mr-2" />
                   Comunidade
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <PhoneCall3 className="h-4 w-4 mr-2" />
+                  <PhoneCall className="h-4 w-4 mr-2" />
                   Suporte 24/7
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Mail4 className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4 mr-2" />
                   Feedback
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileText4 className="h-4 w-4 mr-2" />
+                  <FileText className="h-4 w-4 mr-2" />
                   Políticas
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Video4 className="h-4 w-4 mr-2" />
+                  <Video className="h-4 w-4 mr-2" />
                   Vídeos de Treinamento
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <Book4 className="h-4 w-4 mr-2" />
+                  <Book className="h-4 w-4 mr-2" />
                   Manuais
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileQuestion4 className="h-4 w-4 mr-2" />
+                  <FileQuestion className="h-4 w-4 mr-2" />
                   Dúvidas Frequentes
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <MessageCircle4 className="h-4 w-4 mr-2" />
+                  <MessageCircle className="h-4 w-4 mr-2" />
                   Fale Conosco
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
-                  <PhoneCall4 className="h-4 w-4 mr-2" />
+                  <PhoneCall className="h-4 w-4 mr-2" />
                   Central de Atendimento
                 </Button>
               </div>

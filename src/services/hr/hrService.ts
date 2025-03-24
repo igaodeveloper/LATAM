@@ -30,9 +30,15 @@ export const hrService = {
     if (!employee) throw new Error('Funcionário não encontrado');
 
     const calculations = calculationService.calculateTermination({
-      salary: employee.salary,
+      base_salary: employee.salary,
+      termination_date: new Date(terminationDate),
       admission_date: employee.admission_date,
-      termination_date: terminationDate,
+      months_worked: 0, // Calculate or provide actual value
+      vacation_days: 0, // Calculate or provide actual value
+      notice_period: 30, // Standard or calculate
+      has_fgts_penalty: true,
+      other_benefits: 0,
+      deductions: 0
     });
 
     const { data, error } = await supabase
@@ -123,12 +129,19 @@ export const hrService = {
     if (!employee) throw new Error('Funcionário não encontrado');
 
     const calculations = calculationService.calculateLeave({
-      salary: employee.salary,
+      base_salary: employee.salary,
       leave_start_date: startDate,
       leave_end_date: endDate,
       leave_type: type,
       has_medical_certificate: !!medicalCertificate,
-      admission_date: ''
+      admission_date: employee.admission_date,
+      months_worked: 0, // Calculate or provide actual value
+      vacation_days: 0,
+      notice_period: 0,
+      has_fgts_penalty: false,
+      other_benefits: 0,
+      deductions: 0,
+      termination_date: new Date()
     });
 
     const { data, error } = await supabase

@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { MapPin, Phone, Mail, Clock, MessageSquare, FileText, Video, Book, FileQuestion, MessageCircle, PhoneCall, Mail2, FileText2, Video2, Book2, FileQuestion2, MessageCircle2, PhoneCall2, Mail3, FileText3, Video3, Book3, FileQuestion3, MessageCircle3, PhoneCall3, Mail4, FileText4, Video4, Book4, FileQuestion4, MessageCircle4, PhoneCall4 } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, MessageSquare, FileText, Video, Book, FileQuestion, MessageCircle, PhoneCall, DollarSign, CheckCircle, Shield, Wrench } from "lucide-react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -47,10 +47,10 @@ const Contact = () => {
       email: "manutencao@latam.com",
       phone: "+56 2 565-1236",
       hours: "8h às 18h",
-      icon: Tool,
+      icon: Wrench,
     },
     {
-      id: "safety",
+      id: "safety", 
       name: "Segurança",
       description: "Questões relacionadas à segurança operacional",
       email: "seguranca@latam.com",

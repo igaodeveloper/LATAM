@@ -39,12 +39,16 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 
-const Sidebar = () => {
-  const [isHRExpanded, setIsHRExpanded] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
   const location = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: <LayoutDashboard size={20} /> },
@@ -125,21 +129,21 @@ const Sidebar = () => {
   };
 
   const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+    onToggle();
   };
 
   return (
     <div className="relative">
       <aside className={cn(
         "h-[94%] mx-auto mt-2 mb-1 bg-slate-900 text-white flex flex-col justify-between transition-all duration-300 animate-slide-in-left rounded-2xl min-w-[64px] overflow-y-auto shadow-lg",
-        isCollapsed ? "w-16" : "w-full md:w-64"
+        collapsed ? "w-16" : "w-full md:w-64"
       )}>
         <div>
           {/* Logo */}
           <div className="flex items-center justify-center h-12 border-b border-slate-700 px-4 mx-auto">
             <div className="flex items-center justify-center animate-scale-in w-full">
               <AnimatedLogo size="sm" color="white" className="mr-2" />
-              {!isCollapsed && (
+              {!collapsed && (
                 <div className="text-xl font-bold text-blue-500 whitespace-nowrap">
                   LATAM Airlines
                 </div>
@@ -158,7 +162,7 @@ const Sidebar = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              onClick={() => item.name === "Processos RH" && setIsHRExpanded(!isHRExpanded)}
+                              onClick={() => item.name === "Processos RH" && setShowUserMenu(true)}
                               className={cn(
                                 "w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200",
                                 isActive(item.path) ? "bg-slate-800 text-blue-400" : "text-slate-300",
@@ -167,17 +171,17 @@ const Sidebar = () => {
                               style={{ animationDelay: `${index * 50}ms` }}
                             >
                               <span className="mr-3 flex-shrink-0">{item.icon}</span>
-                              {!isCollapsed && <span className="truncate">{item.name}</span>}
+                              {!collapsed && <span className="truncate">{item.name}</span>}
                             </button>
                           </TooltipTrigger>
-                          {isCollapsed && (
+                          {collapsed && (
                             <TooltipContent side="right">
                               <p>{item.name}</p>
                             </TooltipContent>
                           )}
                         </Tooltip>
                       </TooltipProvider>
-                      {!isCollapsed && item.name === "Processos RH" && isHRExpanded && (
+                      {!collapsed && item.name === "Processos RH" && showUserMenu && (
                         <ul className="ml-6 mt-1 space-y-1">
                           {item.subItems.map((subItem) => (
                             <li key={subItem.path}>
@@ -210,10 +214,10 @@ const Sidebar = () => {
                             style={{ animationDelay: `${index * 50}ms` }}
                           >
                             <span className="mr-3 flex-shrink-0">{item.icon}</span>
-                            {!isCollapsed && <span className="truncate">{item.name}</span>}
+                            {!collapsed && <span className="truncate">{item.name}</span>}
                           </Link>
                         </TooltipTrigger>
-                        {isCollapsed && (
+                        {collapsed && (
                           <TooltipContent side="right">
                             <p>{item.name}</p>
                           </TooltipContent>
@@ -244,7 +248,7 @@ const Sidebar = () => {
                           )}
                         >
                           <span className="mr-3 flex-shrink-0">{item.icon}</span>
-                          {!isCollapsed && <span className="truncate">{item.name}</span>}
+                          {!collapsed && <span className="truncate">{item.name}</span>}
                         </button>
                       ) : (
                         <Link
@@ -255,11 +259,11 @@ const Sidebar = () => {
                           )}
                         >
                           <span className="mr-3 flex-shrink-0">{item.icon}</span>
-                          {!isCollapsed && <span className="truncate">{item.name}</span>}
+                          {!collapsed && <span className="truncate">{item.name}</span>}
                         </Link>
                       )}
                     </TooltipTrigger>
-                    {isCollapsed && (
+                    {collapsed && (
                       <TooltipContent side="right">
                         <p>{item.name}</p>
                       </TooltipContent>
@@ -279,10 +283,10 @@ const Sidebar = () => {
                       <span className="mr-3 flex-shrink-0">
                         <LogOut size={20} />
                       </span>
-                      {!isCollapsed && <span className="truncate">Sair</span>}
+                      {!collapsed && <span className="truncate">Sair</span>}
                     </button>
                   </TooltipTrigger>
-                  {isCollapsed && (
+                  {collapsed && (
                     <TooltipContent side="right">
                       <p>Sair</p>
                     </TooltipContent>
@@ -357,7 +361,7 @@ const Sidebar = () => {
         onClick={toggleSidebar}
         className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-slate-900 text-white p-1 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-lg"
       >
-        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
       </button>
     </div>
   );

@@ -3,7 +3,7 @@ import { CalculationParameters, LeaveType } from '@/types/hr';
 export const calculationService = {
   calculateTermination(params: CalculationParameters) {
     const {
-      salary,
+      base_salary,
       admission_date,
       termination_date,
     } = params;
@@ -19,29 +19,29 @@ export const calculationService = {
     // Calculate working days in the month
     const daysInMonth = new Date(termination.getFullYear(), termination.getMonth() + 1, 0).getDate();
     const workedDays = termination.getDate();
-    const salaryBalance = (salary / daysInMonth) * workedDays;
+    const salaryBalance = (base_salary / daysInMonth) * workedDays;
 
     // Calculate proportional vacation
     const monthsWorked = this.calculateMonthsBetween(admission, termination);
     const vacationDays = monthsWorked * 2.5; // 30 days per year
-    const vacationBalance = (salary / 30) * vacationDays;
+    const vacationBalance = (base_salary / 30) * vacationDays;
 
     // Calculate proportional 13th salary
-    const thirteenthSalary = (salary / 12) * monthsWorked;
+    const thirteenthSalary = (base_salary / 12) * monthsWorked;
 
     // Calculate notice period (30 days)
-    const noticePeriod = salary;
+    const noticePeriod = base_salary;
 
     // Calculate FGTS fine (40% of FGTS balance)
-    const fgtsBalance = salary * 0.08 * monthsWorked; // 8% of salary per month
+    const fgtsBalance = base_salary * 0.08 * monthsWorked; // 8% of salary per month
     const fgtsFine = fgtsBalance * 0.4;
 
     // Other benefits (example: health insurance, transportation)
-    const otherBenefits = salary * 0.1; // 10% of salary
+    const otherBenefits = base_salary * 0.1; // 10% of salary
 
     // Deductions (INSS, IR)
-    const inss = this.calculateINSS(salary);
-    const ir = this.calculateIR(salary - inss);
+    const inss = this.calculateINSS(base_salary);
+    const ir = this.calculateIR(base_salary - inss);
     const deductions = inss + ir;
 
     const totalAmount = salaryBalance + vacationBalance + thirteenthSalary + 
@@ -61,7 +61,7 @@ export const calculationService = {
 
   calculateLeave(params: CalculationParameters) {
     const {
-      salary,
+      base_salary,
       leave_start_date,
       leave_end_date,
       leave_type,
@@ -81,26 +81,26 @@ export const calculationService = {
 
     switch (leave_type) {
       case 'acidente_trabalho':
-        dailyAmount = salary / 30; // 100% of daily salary
+        dailyAmount = base_salary / 30; // 100% of daily salary
         break;
       case 'doenca':
         if (has_medical_certificate) {
-          dailyAmount = salary / 30; // 100% of daily salary
+          dailyAmount = base_salary / 30; // 100% of daily salary
         } else {
-          dailyAmount = (salary / 30) * 0.5; // 50% of daily salary
+          dailyAmount = (base_salary / 30) * 0.5; // 50% of daily salary
         }
         break;
       case 'maternidade':
-        dailyAmount = salary / 30; // 100% of daily salary
+        dailyAmount = base_salary / 30; // 100% of daily salary
         break;
       case 'paternidade':
-        dailyAmount = salary / 30; // 100% of daily salary
+        dailyAmount = base_salary / 30; // 100% of daily salary
         break;
       case 'ferias':
-        dailyAmount = (salary / 30) * 1.33; // 133% of daily salary
+        dailyAmount = (base_salary / 30) * 1.33; // 133% of daily salary
         break;
       default:
-        dailyAmount = salary / 30; // Default to 100% of daily salary
+        dailyAmount = base_salary / 30; // Default to 100% of daily salary
     }
 
     totalAmount = dailyAmount * days;

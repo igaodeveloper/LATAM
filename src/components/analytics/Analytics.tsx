@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Search, Filter, Plus, Download, BarChart, PieChart, LineChart, Calendar, Clock, User, ArrowUp, ArrowDown, TrendingUp, TrendingDown, DollarSign, Users, Plane, Tool, AlertTriangle, CheckCircle, XCircle, Ticket, CreditCard, Database, AlertCircle, Info, Shield, MapPin, Globe, ChevronLeft, ChevronRight, MoreVertical, Star, Tag } from "lucide-react";
+import { Search, Filter, Plus, Download, BarChart, PieChart, LineChart, Calendar, Clock, User, ArrowUp, ArrowDown, TrendingUp, TrendingDown, DollarSign, Users, Plane, AlertTriangle, CheckCircle, XCircle, Ticket, CreditCard, Database, AlertCircle, Info, Shield, MapPin, Globe, ChevronLeft, ChevronRight, MoreVertical, Star, Tag } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
