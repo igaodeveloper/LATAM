@@ -6,7 +6,7 @@ import react from "@vitejs/plugin-react-swc";
 export default defineConfig({
   base: process.env.NODE_ENV === "development" ? "/" : process.env.VITE_BASE_PATH || "/",
   optimizeDeps: {
-    entries: ["src/main.tsx"],
+    entries: ["src/main.tsx", "src/storybook-main.tsx"],
   },
   plugins: [
     react(),
@@ -19,5 +19,13 @@ export default defineConfig({
   },
   server: {
     host: true,
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        storybook: path.resolve(__dirname, 'storybook.html')
+      }
+    }
   }
 });

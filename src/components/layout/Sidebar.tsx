@@ -162,7 +162,7 @@ const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              onClick={() => item.name === "Processos RH" && setShowUserMenu(true)}
+                              onClick={() => item.name === "Processos RH" && setShowUserMenu(!showUserMenu)}
                               className={cn(
                                 "w-full flex items-center p-2 rounded-md hover:bg-slate-800 transition-all duration-200",
                                 isActive(item.path) ? "bg-slate-800 text-blue-400" : "text-slate-300",

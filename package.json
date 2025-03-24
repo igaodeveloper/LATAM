@@ -14,11 +14,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "types:supabase": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/supabase.ts",
-    "postbuild": "cp dist/index.html dist/404.html",
+    "postbuild": "cpy dist/index.html dist --rename=404.html",
     "pre-deploy": "npm run lint && npm run build",
     "vercel-build": "node vercel-build.js",
     "netlify-build": "bash netlify-build.sh",
-    "check-deploy": "node deploy-check.js"
+    "check-deploy": "node deploy-check.js",
+    "storybook": "vite --port 6006 --open storybook.html",
+    "build-storybook": "tsc && vite build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
